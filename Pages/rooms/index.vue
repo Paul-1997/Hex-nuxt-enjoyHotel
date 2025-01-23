@@ -12,8 +12,9 @@ const modules = ref([Autoplay, Navigation, Pagination]);
 
 
 const importImage = (url) => {
-  const image = new URL(url, import.meta.url);
-  return image.href;
+  // const image = new URL(url, import.meta.url);
+  // return image.href;
+  return `/images/${url}`;
 }
 
 const roomImages = computed(() => {
@@ -23,8 +24,8 @@ const roomImages = computed(() => {
   const result = rooms.reduce((acc, roomId) => {
     acc[`room${roomId.toUpperCase()}`] = nums.reduce((obj, num) => {
       obj[num] = {
-        desktop: importImage(`../assets/images/room-${roomId}-${num}.png`),
-        mobile: importImage(`../assets/images/room-${roomId}-sm-${num}.png`)
+        desktop: importImage(`room-${roomId}-${num}.png`),
+        mobile: importImage(`room-${roomId}-sm-${num}.png`)
       };
       return obj;
     }, {});
@@ -37,7 +38,7 @@ const roomImages = computed(() => {
 
 
 </script>
-<!-- 
+
 <template>
   <main>
     <section class="hero position-relative">
@@ -173,7 +174,7 @@ const roomImages = computed(() => {
                     </p>
                     <NuxtLink
                       :to="{
-                        name: 'room-detail',
+                        name: 'rooms-roomId',
                         params: {
                           roomId: 'a'
                         }
@@ -269,7 +270,7 @@ const roomImages = computed(() => {
                     </p>
                     <NuxtLink
                       :to="{
-                        name: 'room-detail',
+                        name: 'rooms-roomId',
                         params: {
                           roomId: 'b'
                         }
@@ -365,7 +366,7 @@ const roomImages = computed(() => {
                     </p>
                     <NuxtLink
                       :to="{
-                        name: 'room-detail',
+                        name: 'rooms-roomId',
                         params: {
                           roomId: 'c'
                         }
@@ -461,7 +462,7 @@ const roomImages = computed(() => {
                     </p>
                     <NuxtLink
                       :to="{
-                        name: 'room-detail',
+                        name: 'rooms-roomId',
                         params: {
                           roomId: 'd'
                         }
@@ -482,9 +483,6 @@ const roomImages = computed(() => {
       </div>
     </section>
   </main>
-</template> -->
-<template>
-  <div>123456</div>
 </template>
 <style lang="scss" scoped>
 @import "bootstrap/scss/mixins/breakpoints";

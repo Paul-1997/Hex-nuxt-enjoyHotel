@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup>
 import { Icon } from '@iconify/vue';
 
 import { Swiper, SwiperSlide } from 'swiper/vue';
@@ -16,7 +16,6 @@ const roomSwiper = ref(null);
 const slidePrev = () => {
   roomSwiper.value.$el.swiper.slidePrev();  
 }
-
 const slideNext = () => {
   roomSwiper.value.$el.swiper.slideNext();
 }

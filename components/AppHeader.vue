@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 const route = useRoute();
 const transparentBgRoute = ['home', 'rooms'];
 
@@ -31,7 +31,7 @@ onUnmounted(() => {
   >
     <nav class="navbar navbar-expand-md p-0 px-3 py-4 px-md-20 py-md-6">
       <div class="container-fluid justify-content-between p-0">
-        <RouterLink
+        <NuxtLink
           class="navbar-brand p-0"
           to="/"
         >
@@ -40,7 +40,7 @@ onUnmounted(() => {
             alt="logo"
             class="logo img-fluid"
           >
-        </RouterLink>
+        </NuxtLink>
         <button
           class="navbar-toggler collapsed p-2 text-white border-0 shadow-none"
           type="button"
@@ -65,14 +65,14 @@ onUnmounted(() => {
         >
           <ul class="navbar-nav gap-4 ms-auto fw-bold">
             <li class="nav-item">
-              <RouterLink
+              <NuxtLink
                 :to="{
                   name: 'rooms'
                 }"
                 class="nav-link p-4 text-neutral-0"
               >
                 客房旅宿
-              </RouterLink>
+              </NuxtLink>
             </li>
             <li class="d-none d-md-block nav-item">
               <div class="btn-group">
@@ -92,10 +92,9 @@ onUnmounted(() => {
                   style="right: 0; left: auto; border-radius: 20px;"
                 >
                   <li>
-                    <a
-                      class="dropdown-item px-6 py-4"
-                      href="#"
-                    >我的帳戶</a>
+                    <NuxtLink to="/user/profile" as="a" class="dropdown-item px-6 py-4">
+                      個人資料
+                    </NuxtLink>
                   </li>
                   <li>
                     <a
@@ -107,22 +106,22 @@ onUnmounted(() => {
               </div>
             </li>
             <li class="d-md-none nav-item">
-              <RouterLink
+              <NuxtLink
                 to="/"
                 class="nav-link p-4 text-neutral-0"
               >
                 會員登入
-              </RouterLink>
+              </NuxtLink>
             </li>
             <li class="nav-item">
-              <RouterLink
+              <NuxtLink
                 :to="{
                   name: 'rooms'
                 }"
                 class="btn btn-primary-100 px-8 py-4 text-white fw-bold border-0 rounded-3"
               >
                 立即訂房
-              </RouterLink>
+              </NuxtLink>
             </li>
           </ul>
         </div>
