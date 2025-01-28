@@ -3,7 +3,7 @@
 import { Icon } from '@iconify/vue';
 
 const route = useRoute();
-const transparentBgRoute = ['home', 'rooms','user'];
+const transparentBgRoute = ['home', 'rooms'];
 
 const isTransparentRoute = computed(() => transparentBgRoute.includes(route.name));
 
