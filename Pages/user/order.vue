@@ -3,14 +3,17 @@ import { Icon } from '@iconify/vue';
 
 definePageMeta({
   layout: 'user',
-});
+  middleware: 'auth'
+},
+);
 const roomId = 'a';  // for navigation demo
 </script>
 
 
 
 <template>
-  <div class="row gap-6 gap-md-0">
+  <div>
+    <div class="row gap-6 gap-md-0">
     <div class="col-12 col-md-7">
       <div
         class="rounded-3xl d-flex flex-column gap-6 gap-md-10 p-4 p-md-10 bg-neutral-0"
@@ -466,6 +469,7 @@ const roomId = 'a';  // for navigation demo
         </div>
       </div>
     </div>
+  </div>
   </div>
 </template>
 

@@ -1,5 +1,5 @@
 <script setup>
-definePageMeta({layout: 'user'});
+definePageMeta({layout: 'user',middleware: 'auth'});
 const isEditPassword = ref(false);
 const isEditProfile = ref(false);
 </script>
