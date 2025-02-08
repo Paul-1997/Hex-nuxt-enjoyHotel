@@ -1,19 +1,17 @@
 <script setup>
-import { debounce } from '#imports';
-
 definePageMeta({
   layout: 'account',
 });
 import { Icon } from '@iconify/vue';
-const isEmailAndPasswordValid = ref(false);
-const isEmailVerified = ref(false);
+const isEmailExist = ref(false);
+// const isEmailVerifiedMsg = ref('');
 const step = ref(1);
 const veeValidateSchema = {
   email: 'required|email',
   password: 'required|min:8',
-  confirmPassword: 'required|confirmed:@password',// TODO: 這裡驗證怪怪 下班再來處理
+  confirmPassword: 'required|confirmed:@password',
   name: 'required',
-  tel: 'required|regex:/^09[0-9]{8}$/',
+  phone: {required: true, regex: /^09\d{8}$/},
   address: 'required',
 };
 // form instance
@@ -23,45 +21,36 @@ const formData = reactive({
   password: '',
   confirmPassword: '',
   name: '',
-  tel: '',
+  phone: '',
   address: '',
 });
 
 // check email is verified or not
 const checkStepOneVerify = async (validate) => {
+  
   const res = await Promise.all([
     validate('email'),
     validate('password'),
-    validate('confirmedPassword'),
+    validate('confirmPassword'),
   ]);
-  console.log(res.every(r=>r.valid));
-  // veeValidate is valid data ?
-  // console.log(isEmailAndPasswordValid);
-  return;
-  // 1. 驗證 email password 格式是否正確
-  // 2. 驗證 email 是否已經註冊過
-  // 3. 若已驗證但 email 被修改 ， 則重新驗證
-  try {
-    const isEmailExist = await checkEmailVerification();
-    if (isEmailExist) return;
-    else {
-      step.value = 2;
-    }
-  } catch (error) {
-    console.error('Form validation error:', error);
+  if(isEmailExist && res.every(r=> r.valid)){
+    step.value = 2;
   }
 };
 
 const checkEmailVerification = debounce(async () => {
   try {
-    await validateEmail();
+    isEmailExist.value = false;
     const response = await $fetch('https://freyja-01v8.onrender.com/api/v1/verify/email', {
       method: 'POST',
       body: { email: formData.email },
     });
-    isEmailVerified.value = response?.result?.isEmailExist;
+    // console.log(response);
+    isEmailExist.value = !response?.result?.isEmailExist;
   } catch (error) {
     const { message } = error?.response?._data;
+    // console.log(message);
+    // if(message) isEmailVerifiedMsg.value = ''
   }
 });
 </script>
@@ -74,9 +63,9 @@ const checkEmailVerification = debounce(async () => {
 
       <div class="d-flex align-items-center py-4 gap-2">
         <div class="d-flex flex-column align-items-center gap-1 text-neutral-0">
-          <span :class="{ 'd-none': isEmailAndPasswordValid }" class="step p-2 bg-primary-100 rounded-circle">1</span>
+          <span :class="{ 'd-none': step === 2 }" class="step p-2 bg-primary-100 rounded-circle">1</span>
           <Icon
-            :class="{ 'd-none': !isEmailAndPasswordValid }"
+            :class="{ 'd-none': step < 2 }"
             class="p-2 fs-3 bg-primary-100 rounded-circle"
             icon="material-symbols:check"
           />
@@ -87,15 +76,15 @@ const checkEmailVerification = debounce(async () => {
 
         <div
           :class="{
-            'text-neutral-0': isEmailAndPasswordValid,
-            'text-neutral-60': !isEmailAndPasswordValid,
+            'text-neutral-0': step === 2,
+            'text-neutral-60': !step === 2,
           }"
           class="d-flex flex-column align-items-center gap-1"
         >
           <span
             :class="{
-              'bg-primary-100': isEmailAndPasswordValid,
-              'bg-transparent border border-neutral-60': !isEmailAndPasswordValid,
+              'bg-primary-100': step === 2,
+              'bg-transparent border border-neutral-60': !step === 2,
             }"
             class="step p-2 rounded-circle"
             >2</span
@@ -114,7 +103,7 @@ const checkEmailVerification = debounce(async () => {
         v-slot="{ errors, validateField }"
       >
         <!-- step1 -->
-        <div id="signUpStep1">
+        <div id="signUpStep1" v-if="step === 1">
           <div class="mb-4 fs-8 fs-md-7">
             <label class="mb-2 text-neutral-0 fw-bold" for="email"> 電子信箱 </label>
             <VeeField
@@ -130,12 +119,15 @@ const checkEmailVerification = debounce(async () => {
                 id="email"
                 type="text"
                 class="form-control p-4 text-neutral-100 fw-medium border-neutral-40"
-                :class="{ 'is-invalid': errors.email, 'is-valid': meta.valid && meta.dirty && isEmailVerified }"
+                :class="{ 'is-invalid': errors.email, 'is-valid': meta.valid && meta.dirty && isEmailExist }"
                 placeholder="請輸入電子信箱"
               />
             </VeeField>
-            <VeeErrorMessage name="email" as="p" class="text-danger fw-bold mt-1 ps-2" />
-          </div>
+            <VeeErrorMessage name="email" v-slot="{ message }">
+              <p class="text-danger fw-bold mt-1 ps-2">
+                {{ !isEmailExist ? message : '此信箱已被註冊' }}
+              </p>
+            </VeeErrorMessage>          </div>
           <div class="mb-4 fs-8 fs-md-7">
             <label class="mb-2 text-neutral-0 fw-bold" for="password"> 密碼 </label>
             <VeeField v-slot="{ meta, field }" type="password" name="password" label="密碼" v-model="formData.password">
@@ -179,7 +171,7 @@ const checkEmailVerification = debounce(async () => {
           </button>
         </div>
 
-        <div id="signUpStep2">
+        <div id="signUpStep2" v-if="step > 1">
           <div class="mb-4 fs-8 fs-md-7">
             <label class="mb-2 text-neutral-0 fw-bold" for="name"> 姓名 </label>
             <VeeField v-slot="{ meta, field }" type="text" name="name" label="姓名" v-model="formData.name">
@@ -196,17 +188,18 @@ const checkEmailVerification = debounce(async () => {
           </div>
           <div class="mb-4 fs-8 fs-md-7">
             <label class="mb-2 text-neutral-0 fw-bold" for="phone"> 手機號碼 </label>
-            <VeeField v-slot="{ meta, field }" type="tel" name="tel" label="手機號碼" v-model="formData.tel">
+            <VeeField v-slot="{ meta, field }" type="text" name="phone" label="手機號碼" v-model.trim="formData.phone">
               <input
                 v-bind="field"
                 id="phone"
-                type="tel"
+                type="text"
                 class="form-control p-4 text-neutral-100 fw-medium border-neutral-40"
                 :class="{ 'is-invalid': errors.tel, 'is-valid': meta.valid && meta.dirty }"
-                placeholder="請輸入手機號碼"
+                placeholder="請輸入手機號碼 ex: 09xxxxxxxx"
+                inputmode="numeric"
               />
             </VeeField>
-            <VeeErrorMessage name="tel" as="p" class="text-danger fw-bold mt-1 ps-2" />
+            <VeeErrorMessage name="phone" as="p" class="text-danger fw-bold mt-1 ps-2" />
           </div>
           <div class="mb-4 fs-8 fs-md-7">
             <label class="mb-2 text-neutral-0 fw-bold" for="birth"> 生日 </label>
