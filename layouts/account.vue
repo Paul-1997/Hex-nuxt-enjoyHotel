@@ -1,8 +1,6 @@
 <script setup>
 
 import { Icon } from '@iconify/vue';
-
-// import 'bootstrap/js/dist/collapse';
 </script>
 
 <template>
@@ -108,7 +106,7 @@ import { Icon } from '@iconify/vue';
         </picture>
         
         <main class="position-relative w-100 w-md-auto">
-          <RouterView />
+          <NuxtPage />
         </main>
       </div>
     </div>

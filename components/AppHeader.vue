@@ -77,7 +77,7 @@ onUnmounted(() => {
                 客房旅宿
               </NuxtLink>
             </li>
-            <li class="d-none d-md-block nav-item">
+            <!-- <li class="d-none d-md-block nav-item">
               <div class="btn-group">
                 <button
                   type="button"
@@ -107,10 +107,10 @@ onUnmounted(() => {
                   </li>
                 </ul>
               </div>
-            </li>
-            <li class="d-md-none nav-item">
+            </li> -->
+            <li class="nav-item">
               <NuxtLink
-                to="/"
+                to="/account/login"
                 class="nav-link p-4 text-neutral-0"
               >
                 會員登入
