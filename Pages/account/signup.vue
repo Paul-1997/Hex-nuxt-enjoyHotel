@@ -1,19 +1,10 @@
 <script setup>
+import { Icon } from '@iconify/vue';
+import zipcode from '~/assets/zipcode';
+
 definePageMeta({
   layout: 'account',
 });
-import { Icon } from '@iconify/vue';
-const isEmailExist = ref(false);
-// const isEmailVerifiedMsg = ref('');
-const step = ref(1);
-const veeValidateSchema = {
-  email: 'required|email',
-  password: 'required|min:8',
-  confirmPassword: 'required|confirmed:@password',
-  name: 'required',
-  phone: {required: true, regex: /^09\d{8}$/},
-  address: 'required',
-};
 // form instance
 const form = ref(null);
 const formData = reactive({
@@ -22,22 +13,74 @@ const formData = reactive({
   confirmPassword: '',
   name: '',
   phone: '',
-  address: '',
+  birthday: {
+    year: '',
+    month: '',
+    day: '',
+  },
+  address: {
+    city: '',
+    county: '',
+    path: ''
+  },
 });
-
-// check email is verified or not
-const checkStepOneVerify = async (validate) => {
-  
-  const res = await Promise.all([
-    validate('email'),
-    validate('password'),
-    validate('confirmPassword'),
-  ]);
-  if(isEmailExist && res.every(r=> r.valid)){
-    step.value = 2;
+// form validation
+const step = ref(1);
+const isEmailExist = ref(false);
+const veeValidateSchema = {
+  email: 'required|email',
+  password: 'required|min:8',
+  confirmPassword: 'required|confirmed:@password',
+  name: 'required',
+  phone: { required: true, regex: /^09\d{8}$/ },
+  address: 'required',
+  birthday_year: (v)=> v ? true :'請選擇年分',
+  birthday_month: (v)=> v ? true :'請選擇月分',
+  birthday_day: (v)=> v ? true :'請選擇日期',
+  address: (value) =>{
+    if(formData.address.city === '' || formData.address.county === '' || value === '') return '請填寫地址';
+    return true;
+  },
+  agreePolicy: (value) => {
+    return value === true ? true : '請同意個資使用規範';
   }
 };
 
+const VerifyStepOne = async (validate) => {
+  const res = await Promise.all([validate('email'), validate('password'), validate('confirmPassword')]);
+  if (isEmailExist && res.every((r) => r.valid)) {
+    step.value = 2;
+  }
+};
+// all data will be auto validate by vee-validate,
+// if all data is valid, then this function will be called
+const onSubmitForm = async (v) => {
+  const birthday = [formData.birthday.year, formData.birthday.month, formData.birthday.day].map(x=> x.split(' ')[0]).join('/');
+
+  const data =   {
+  name: formData.name,
+  email: formData.email,
+  password: formData.password,
+  phone: formData.phone,
+  birthday,
+  address: {
+    zipcode: formData.address.county,
+    detail: formData.address.path,
+  }
+};
+  try{
+    const res = await $fetch('https://freyja-01v8.onrender.com/api/v1/user/signup', {
+      method: 'POST',
+      body: data,
+    });
+    console.log(res); 
+    // TODO:彈出視窗5s後 導向至login頁面
+    // navigateTo('/login');
+  }catch(error){
+    console.log(error.response);
+  }
+};
+// check email is verified or not when input
 const checkEmailVerification = debounce(async () => {
   try {
     isEmailExist.value = false;
@@ -53,6 +96,14 @@ const checkEmailVerification = debounce(async () => {
     // if(message) isEmailVerifiedMsg.value = ''
   }
 });
+
+// zipcode data
+const cites = Object.keys(zipcode);
+const county = computed(() =>{
+  if(formData.address.city === '') return [];
+  return Object.keys(zipcode[formData.address.city]).map((key) => [key, zipcode[formData.address?.city][key]]);
+});
+
 </script>
 
 <template>
@@ -100,10 +151,11 @@ const checkEmailVerification = debounce(async () => {
         class="mb-4"
         as="form"
         :validation-schema="veeValidateSchema"
-        v-slot="{ errors, validateField }"
+        v-slot="{ errors, validateField, validate}"
+        @submit="onSubmitForm()"
       >
         <!-- step1 -->
-        <div id="signUpStep1" v-if="step === 1">
+        <div id="signUpStep1" v-if="step < 2">
           <div class="mb-4 fs-8 fs-md-7">
             <label class="mb-2 text-neutral-0 fw-bold" for="email"> 電子信箱 </label>
             <VeeField
@@ -113,6 +165,7 @@ const checkEmailVerification = debounce(async () => {
               label="電子信箱"
               v-model="formData.email"
               @update:model-value="checkEmailVerification()"
+              :keep-value="true"
             >
               <input
                 v-bind="field"
@@ -127,10 +180,11 @@ const checkEmailVerification = debounce(async () => {
               <p class="text-danger fw-bold mt-1 ps-2">
                 {{ !isEmailExist ? message : '此信箱已被註冊' }}
               </p>
-            </VeeErrorMessage>          </div>
+            </VeeErrorMessage>
+          </div>
           <div class="mb-4 fs-8 fs-md-7">
             <label class="mb-2 text-neutral-0 fw-bold" for="password"> 密碼 </label>
-            <VeeField v-slot="{ meta, field }" type="password" name="password" label="密碼" v-model="formData.password">
+            <VeeField v-slot="{ meta, field }" type="password" name="password" label="密碼" v-model="formData.password" :keep-value="true">
               <input
                 v-bind="field"
                 id="password"
@@ -150,6 +204,7 @@ const checkEmailVerification = debounce(async () => {
               name="confirmPassword"
               label="確認密碼"
               v-model="formData.confirmPassword"
+              :keep-value="true"
             >
               <input
                 v-bind="field"
@@ -165,13 +220,12 @@ const checkEmailVerification = debounce(async () => {
           <button
             class="btn btn-neutral-40 w-100 py-4 text-neutral-60 fw-bold"
             type="button"
-            @click="checkStepOneVerify(validateField)"
+            @click="VerifyStepOne(validateField)"
           >
             下一步
           </button>
         </div>
-
-        <div id="signUpStep2" v-if="step > 1">
+        <div id="signUpStep2" v-else>
           <div class="mb-4 fs-8 fs-md-7">
             <label class="mb-2 text-neutral-0 fw-bold" for="name"> 姓名 </label>
             <VeeField v-slot="{ meta, field }" type="text" name="name" label="姓名" v-model="formData.name">
@@ -194,7 +248,7 @@ const checkEmailVerification = debounce(async () => {
                 id="phone"
                 type="text"
                 class="form-control p-4 text-neutral-100 fw-medium border-neutral-40"
-                :class="{ 'is-invalid': errors.tel, 'is-valid': meta.valid && meta.dirty }"
+                :class="{ 'is-invalid': errors.phone, 'is-valid': meta.valid && meta.dirty }"
                 placeholder="請輸入手機號碼 ex: 09xxxxxxxx"
                 inputmode="numeric"
               />
@@ -204,50 +258,83 @@ const checkEmailVerification = debounce(async () => {
           <div class="mb-4 fs-8 fs-md-7">
             <label class="mb-2 text-neutral-0 fw-bold" for="birth"> 生日 </label>
             <div class="d-flex gap-2">
-              <select id="birth" class="form-select p-4 text-neutral-80 fw-medium rounded-3">
-                <option v-for="year in 65" :key="year" :value="`${year + 1958} 年`">{{ year + 1958 }} 年</option>
-              </select>
-              <select class="form-select p-4 text-neutral-80 fw-medium rounded-3">
-                <option v-for="month in 12" :key="month" :value="`${month} 月`">{{ month }} 月</option>
-              </select>
-              <select class="form-select p-4 text-neutral-80 fw-medium rounded-3">
-                <option v-for="day in 30" :key="day" :value="`${day} 日`">{{ day }} 日</option>
-              </select>
+              <VeeField
+                v-slot="{ value }"
+                as="select"
+                v-model="formData.birthday.year"
+                id="birth"
+                name="birthday_year"
+                class="form-select p-4 text-neutral-80 fw-medium rounded-3"
+              >
+                <option v-for="year in 65" :key="year" :value="`${year + 1958} 年`" :selected="value !== ''">
+                  {{ year + 1958 }} 年
+                </option>
+              </VeeField>
+              <VeeField
+                v-slot="{ value }"
+                as="select"
+                v-model="formData.birthday.month"
+                name="birthday_month"
+                class="form-select p-4 text-neutral-80 fw-medium rounded-3"
+              >
+                <option v-for="month in 12" :key="month" :value="`${month} 月`" :selected="value !== ''">
+                  {{ month }} 月
+                </option>
+              </VeeField>
+              <VeeField
+                v-slot="{ value }"
+                as="select"
+                v-model="formData.birthday.day"
+                name="birthday_day"
+                class="form-select p-4 text-neutral-80 fw-medium rounded-3"
+              >
+                <option v-for="day in 30" :key="day" :value="`${day} 日`" :selected="value !== ''">{{ day }} 日</option>
+              </VeeField>
             </div>
+            <VeeErrorMessage name="birthday_year" as="p" class="text-danger fw-bold mt-1 ps-2" v-if="errors.birthday_year" />
+            <VeeErrorMessage name="birthday_year" as="p" class="text-danger fw-bold mt-1 ps-2" v-else-if="errors.birthday_month" />
+            <VeeErrorMessage name="birthday_year" as="p" class="text-danger fw-bold mt-1 ps-2" v-else="errors.birthday_year" />
           </div>
           <div class="mb-4 fs-8 fs-md-7">
             <label class="form-label text-neutral-0 fw-bold" for="address"> 地址 </label>
             <div>
               <div class="d-flex gap-2 mb-2">
-                <select class="form-select p-4 text-neutral-80 fw-medium rounded-3">
-                  <option value="臺北市">臺北市</option>
-                  <option value="臺中市">臺中市</option>
-                  <option selected value="高雄市">高雄市</option>
+                <select class="form-select p-4 text-neutral-80 fw-medium rounded-3" v-model="formData.address.city">
+                  <option value="" disabled selected>請選擇城市</option>
+                  <option :value="city" v-for="city in cites" :key="city">{{city}}</option>
                 </select>
-                <select class="form-select p-4 text-neutral-80 fw-medium rounded-3">
-                  <option value="前金區">前金區</option>
-                  <option value="鹽埕區">鹽埕區</option>
-                  <option selected value="新興區">新興區</option>
+                <select class="form-select p-4 text-neutral-80 fw-medium rounded-3" v-model="formData.address.county">
+                  <option value="" disabled selected>請選擇地區</option>
+                  <option :value="County[1]" v-for="County in county" :key="County">
+                    {{ `${County[1]} ${County[0]}` }}
+                  </option>
                 </select>
               </div>
-              <VeeField v-slot="{ meta, field }" type="text" name="address" label="地址" v-model="formData.address">
+              <VeeField v-slot="{ field }" type="text" name="address" label="地址" v-model="formData.address.path">
                 <input
                   v-bind="field"
                   id="address"
                   type="text"
                   class="form-control p-4 text-neutral-100 fw-medium border-neutral-40"
-                  :class="{ 'is-invalid': errors.address, 'is-valid': meta.valid && meta.dirty }"
                   placeholder="請輸入詳細地址"
+                  :disabled="
+                    formData.address.city === '' ||
+                    formData.address.county === '' ||
+                    formData.address.city === undefined
+                  "
+                  :class="{ 'opacity-75 disabled': formData.address.city === '' || formData.address.county === '' }"
                 />
               </VeeField>
               <VeeErrorMessage name="address" as="p" class="text-danger fw-bold mt-1 ps-2" />
+              {{  formData.address }}
             </div>
           </div>
 
           <div class="form-check d-flex align-items-end gap-2 mb-10 text-neutral-0">
-            <input id="agreementCheck" class="form-check-input" type="checkbox" value="" />
+            <VeeField name="agreePolicy" id="agreementCheck" type="checkbox" class="form-check-input" :value="true"/>
             <label class="form-check-label fw-bold" for="agreementCheck"> 我已閱讀並同意本網站個資使用規範 </label>
           </div>
+          <VeeErrorMessage name="agreePolicy" as="p" class="text-danger fw-bold"/>
           <button class="btn btn-primary-100 w-100 py-4 text-neutral-0 fw-bold" type="submit">完成註冊</button>
         </div>
       </VeeForm>
