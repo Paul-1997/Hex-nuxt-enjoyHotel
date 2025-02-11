@@ -5,6 +5,8 @@ import zipcode from '~/assets/zipcode';
 definePageMeta({
   layout: 'account',
 });
+// plugin
+const { $Swal } = useNuxtApp();
 // form instance
 const form = ref(null);
 const formData = reactive({
@@ -21,12 +23,14 @@ const formData = reactive({
   address: {
     city: '',
     county: '',
-    path: ''
+    path: '',
   },
 });
 // form validation
 const step = ref(1);
-const isEmailExist = ref(false);
+const isEmailAvailable = ref(false);
+const isVerifyingEmail = ref(false);
+const isEmailAvailableMsg = ref('');
 const veeValidateSchema = {
   email: 'required|email',
   password: 'required|min:8',
@@ -34,76 +38,100 @@ const veeValidateSchema = {
   name: 'required',
   phone: { required: true, regex: /^09\d{8}$/ },
   address: 'required',
-  birthday_year: (v)=> v ? true :'請選擇年分',
-  birthday_month: (v)=> v ? true :'請選擇月分',
-  birthday_day: (v)=> v ? true :'請選擇日期',
-  address: (value) =>{
-    if(formData.address.city === '' || formData.address.county === '' || value === '') return '請填寫地址';
+  birthday_year: (v) => (v ? true : '請選擇年分'),
+  birthday_month: (v) => (v ? true : '請選擇月分'),
+  birthday_day: (v) => (v ? true : '請選擇日期'),
+  address: (value) => {
+    if (formData.address.city === '' || formData.address.county === '' || value === '') return '請填寫地址';
     return true;
   },
   agreePolicy: (value) => {
     return value === true ? true : '請同意個資使用規範';
-  }
+  },
 };
 
 const VerifyStepOne = async (validate) => {
   const res = await Promise.all([validate('email'), validate('password'), validate('confirmPassword')]);
-  if (isEmailExist && res.every((r) => r.valid)) {
+  if (isEmailAvailable && res.every((r) => r.valid)) {
     step.value = 2;
   }
 };
 // all data will be auto validate by vee-validate,
 // if all data is valid, then this function will be called
+let timerInterval;
 const onSubmitForm = async (v) => {
-  const birthday = [formData.birthday.year, formData.birthday.month, formData.birthday.day].map(x=> x.split(' ')[0]).join('/');
+  const birthday = [formData.birthday.year, formData.birthday.month, formData.birthday.day]
+    .map((x) => x.split(' ')[0])
+    .join('/');
 
-  const data =   {
-  name: formData.name,
-  email: formData.email,
-  password: formData.password,
-  phone: formData.phone,
-  birthday,
-  address: {
-    zipcode: formData.address.county,
-    detail: formData.address.path,
-  }
-};
-  try{
+  const data = {
+    name: formData.name,
+    email: formData.email,
+    password: formData.password,
+    phone: formData.phone,
+    birthday,
+    address: {
+      zipcode: formData.address.county,
+      detail: formData.address.path,
+    },
+  };
+  try {
     const res = await $fetch('https://freyja-01v8.onrender.com/api/v1/user/signup', {
       method: 'POST',
       body: data,
     });
-    console.log(res); 
-    // TODO:彈出視窗5s後 導向至login頁面
-    // navigateTo('/login');
-  }catch(error){
-    console.log(error.response);
+    // 彈出視窗5s後 導向至login頁面
+    const { isConfirmed } = await $Swal.fire({
+      title: '註冊成功!',
+      text: '將在 5 秒後重新導向至登入',
+      icon: 'success',
+      timer: 5000,
+      timerProgressBar: true,
+      confirmButtonText: '立即跳轉',
+      didOpen: () => {
+        const timer = $Swal.getHtmlContainer();
+        timerInterval = setInterval(() => {
+          timer.textContent = `將在 ${Math.ceil($Swal.getTimerLeft() / 1000)} 秒後跳轉頁面`;
+        }, 1000);
+      },
+      willClose: () => {
+        clearInterval(timerInterval);
+        navigateTo('login');
+      },
+    });
+    if (isConfirmed) navigateTo('login');
+  } catch (error) {
+    Swal.fire({
+      title: '註冊失敗',
+      html: error?.response?._data?.message || '',
+      icon: 'error',
+    });
+    // console.log(error.response);
   }
 };
 // check email is verified or not when input
 const checkEmailVerification = debounce(async () => {
   try {
-    isEmailExist.value = false;
+    isVerifyingEmail.value = true;
+    isEmailAvailable.value = false;
     const response = await $fetch('https://freyja-01v8.onrender.com/api/v1/verify/email', {
       method: 'POST',
       body: { email: formData.email },
     });
-    // console.log(response);
-    isEmailExist.value = !response?.result?.isEmailExist;
+    isEmailAvailable.value = !response?.result?.isEmailExists;
+    isEmailAvailableMsg.value = isEmailAvailable.value ? '' : '此信箱已被註冊';
   } catch (error) {
-    const { message } = error?.response?._data;
-    // console.log(message);
-    // if(message) isEmailVerifiedMsg.value = ''
+  } finally {
+    isVerifyingEmail.value = false;
   }
 });
 
 // zipcode data
 const cites = Object.keys(zipcode);
-const county = computed(() =>{
-  if(formData.address.city === '') return [];
+const county = computed(() => {
+  if (formData.address.city === '') return [];
   return Object.keys(zipcode[formData.address.city]).map((key) => [key, zipcode[formData.address?.city][key]]);
 });
-
 </script>
 
 <template>
@@ -151,7 +179,7 @@ const county = computed(() =>{
         class="mb-4"
         as="form"
         :validation-schema="veeValidateSchema"
-        v-slot="{ errors, validateField, validate}"
+        v-slot="{ errors, validateField }"
         @submit="onSubmitForm()"
       >
         <!-- step1 -->
@@ -164,7 +192,7 @@ const county = computed(() =>{
               name="email"
               label="電子信箱"
               v-model="formData.email"
-              @update:model-value="checkEmailVerification()"
+              @update:model-value="((isEmailAvailableMsg = ''), checkEmailVerification())"
               :keep-value="true"
             >
               <input
@@ -172,19 +200,28 @@ const county = computed(() =>{
                 id="email"
                 type="text"
                 class="form-control p-4 text-neutral-100 fw-medium border-neutral-40"
-                :class="{ 'is-invalid': errors.email, 'is-valid': meta.valid && meta.dirty && isEmailExist }"
+                :class="{ 'is-invalid': errors.email, 'is-valid': meta.valid && isEmailAvailable }"
                 placeholder="請輸入電子信箱"
               />
+              <div class="fw-bold mt-2" v-if="!errors.email && meta.dirty">
+                <p class="text-secondary" v-if="isVerifyingEmail && !isEmailAvailable">
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>驗證中
+                </p>
+                <p v-else class="text-danger">{{ isEmailAvailableMsg }}</p>
+              </div>
             </VeeField>
-            <VeeErrorMessage name="email" v-slot="{ message }">
-              <p class="text-danger fw-bold mt-1 ps-2">
-                {{ !isEmailExist ? message : '此信箱已被註冊' }}
-              </p>
-            </VeeErrorMessage>
+            <VeeErrorMessage name="email" class="text-danger fw-bold mt-1 ps-2" />
           </div>
           <div class="mb-4 fs-8 fs-md-7">
             <label class="mb-2 text-neutral-0 fw-bold" for="password"> 密碼 </label>
-            <VeeField v-slot="{ meta, field }" type="password" name="password" label="密碼" v-model="formData.password" :keep-value="true">
+            <VeeField
+              v-slot="{ meta, field }"
+              type="password"
+              name="password"
+              label="密碼"
+              v-model="formData.password"
+              :keep-value="true"
+            >
               <input
                 v-bind="field"
                 id="password"
@@ -291,9 +328,24 @@ const county = computed(() =>{
                 <option v-for="day in 30" :key="day" :value="`${day} 日`" :selected="value !== ''">{{ day }} 日</option>
               </VeeField>
             </div>
-            <VeeErrorMessage name="birthday_year" as="p" class="text-danger fw-bold mt-1 ps-2" v-if="errors.birthday_year" />
-            <VeeErrorMessage name="birthday_year" as="p" class="text-danger fw-bold mt-1 ps-2" v-else-if="errors.birthday_month" />
-            <VeeErrorMessage name="birthday_year" as="p" class="text-danger fw-bold mt-1 ps-2" v-else="errors.birthday_year" />
+            <VeeErrorMessage
+              name="birthday_year"
+              as="p"
+              class="text-danger fw-bold mt-1 ps-2"
+              v-if="errors.birthday_year"
+            />
+            <VeeErrorMessage
+              name="birthday_year"
+              as="p"
+              class="text-danger fw-bold mt-1 ps-2"
+              v-else-if="errors.birthday_month"
+            />
+            <VeeErrorMessage
+              name="birthday_year"
+              as="p"
+              class="text-danger fw-bold mt-1 ps-2"
+              v-else="errors.birthday_year"
+            />
           </div>
           <div class="mb-4 fs-8 fs-md-7">
             <label class="form-label text-neutral-0 fw-bold" for="address"> 地址 </label>
@@ -301,7 +353,7 @@ const county = computed(() =>{
               <div class="d-flex gap-2 mb-2">
                 <select class="form-select p-4 text-neutral-80 fw-medium rounded-3" v-model="formData.address.city">
                   <option value="" disabled selected>請選擇城市</option>
-                  <option :value="city" v-for="city in cites" :key="city">{{city}}</option>
+                  <option :value="city" v-for="city in cites" :key="city">{{ city }}</option>
                 </select>
                 <select class="form-select p-4 text-neutral-80 fw-medium rounded-3" v-model="formData.address.county">
                   <option value="" disabled selected>請選擇地區</option>
@@ -326,15 +378,14 @@ const county = computed(() =>{
                 />
               </VeeField>
               <VeeErrorMessage name="address" as="p" class="text-danger fw-bold mt-1 ps-2" />
-              {{  formData.address }}
             </div>
           </div>
 
           <div class="form-check d-flex align-items-end gap-2 mb-10 text-neutral-0">
-            <VeeField name="agreePolicy" id="agreementCheck" type="checkbox" class="form-check-input" :value="true"/>
+            <VeeField name="agreePolicy" id="agreementCheck" type="checkbox" class="form-check-input" :value="true" />
             <label class="form-check-label fw-bold" for="agreementCheck"> 我已閱讀並同意本網站個資使用規範 </label>
           </div>
-          <VeeErrorMessage name="agreePolicy" as="p" class="text-danger fw-bold"/>
+          <VeeErrorMessage name="agreePolicy" as="p" class="text-danger fw-bold" />
           <button class="btn btn-primary-100 w-100 py-4 text-neutral-0 fw-bold" type="submit">完成註冊</button>
         </div>
       </VeeForm>

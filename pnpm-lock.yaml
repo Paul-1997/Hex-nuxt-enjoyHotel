@@ -32,6 +32,9 @@ importers:
       pinia:
         specifier: ^2.3.0
         version: 2.3.1(typescript@5.7.3)(vue@3.5.13(typescript@5.7.3))
+      sweetalert2:
+        specifier: ^11.16.0
+        version: 11.16.0
       swiper:
         specifier: ^11.1.8
         version: 11.2.1
@@ -2853,6 +2856,9 @@ packages:
     resolution: {integrity: sha512-OoohrmuUlBs8B8o6MB2Aevn+pRIH9zDALSR+6hhqVfa6fRwG/Qw9VUMSMW9VNg2CFc/MTIfabtdOVl9ODIJjpw==}
     engines: {node: '>=14.0.0'}
     hasBin: true
+
+  sweetalert2@11.16.0:
+    resolution: {integrity: sha512-4CGgNMpQHcwV+Gov0j4u3lDc/5lyl04NBsa1vW0Se9cqsrQoUimD6/Z5UyZiRP4kMbwQGyb7wsp0x3ytybti6w==}
 
   swiper@11.2.1:
     resolution: {integrity: sha512-62G69+iQRIfUqTmJkWpZDcX891Ra8O9050ckt1/JI2H+0483g+gq0m7gINecDqMtDh2zt5dK+uzBRxGhGOOvQA==}
@@ -6513,6 +6519,8 @@ snapshots:
       css-what: 6.1.0
       csso: 5.0.5
       picocolors: 1.1.1
+
+  sweetalert2@11.16.0: {}
 
   swiper@11.2.1: {}
 
