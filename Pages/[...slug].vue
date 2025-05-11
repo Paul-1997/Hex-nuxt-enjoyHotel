@@ -1,25 +1,35 @@
 <script setup>
 
-definePageMeta({ layout: false });
+definePageMeta({ layout: false })
 
 // 否則會回傳200 成功
-const  event = useRequestEvent();
-setResponseStatus(event, 404);
+const event = useRequestEvent()
+setResponseStatus(event, 404)
 
-const backToHome  = () => navigateTo('/');
+const backToHome = () => navigateTo('/')
 
 </script>
 <template>
   <div style="background-color: #4b4b4bce">
     <div class="error__container min-vh-100">
       <div class="error__content d-flex flex-wrap justify-content-center align-items-center">
-        <h1 class="error__content__statusCode">404</h1>
+        <h1 class="error__content__statusCode">
+          404
+        </h1>
         <div class="error__content__message">
-          <p class="mb-5">噢不！發生了一些意外 🙁</p>
+          <p class="mb-5">
+            噢不！發生了一些意外 🙁
+          </p>
           <div class="mb-5">
             <p>找不到該頁面</p>
           </div>
-          <button type="button" @click="backToHome" class="btn btn-outline-light rounded-3 w-100">點我返回首頁</button>
+          <button
+            type="button"
+            class="btn btn-outline-light rounded-3 w-100"
+            @click="backToHome"
+          >
+            點我返回首頁
+          </button>
         </div>
       </div>
     </div>

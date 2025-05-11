@@ -1,34 +1,48 @@
 <script setup>
+import { Icon } from '@iconify/vue'
+const { errorAlert } = useAlert()
+const { checkLogin, getUserInfo, userLogout } = useUserStore()
+const { isLogin, userInfo } = storeToRefs(useUserStore())
+// 掛載時驗證使用者是否登入
+onMounted(async () => {
+  const v = useCookie('HotelToken')
+  await checkLogin()
+  // 若先前已有資料則不在重複獲取
+  if (isLogin) {
+    try {
+      await getUserInfo()
+    } catch (error) {
+      errorAlert()
+    }
+  }
+})
 
-import { Icon } from '@iconify/vue';
+const route = useRoute()
+const transparentBgRoute = ['home', 'rooms']
 
-const route = useRoute();
-const transparentBgRoute = ['home', 'rooms'];
+const isTransparentRoute = computed(() => transparentBgRoute.includes(route.name))
 
-const isTransparentRoute = computed(() => transparentBgRoute.includes(route.name));
-
-
-const isScrolled = ref(false);
+const isScrolled = ref(false)
 
 const handleScroll = () => {
-  isScrolled.value = window.scrollY > 50;
+  isScrolled.value = window.scrollY > 50
 }
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll);
+  window.addEventListener('scroll', handleScroll)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll);
+  window.removeEventListener('scroll', handleScroll)
 })
 </script>
 
 <template>
   <header
     :class="{
-      'scrolled': isScrolled,
+      scrolled: isScrolled,
       'bg-transparent': isTransparentRoute,
-      'bg-neutral-120': !isTransparentRoute
+      'bg-neutral-120': !isTransparentRoute,
     }"
     class="position-fixed top-0 z-3 w-100"
   >
@@ -70,56 +84,77 @@ onUnmounted(() => {
             <li class="nav-item">
               <NuxtLink
                 :to="{
-                  name: 'rooms'
+                  name: 'rooms',
                 }"
                 class="nav-link p-4 text-neutral-0"
               >
                 客房旅宿
               </NuxtLink>
             </li>
+            <template v-if="isLogin">
+              <li class="nav-item">
+                <div class="btn-group">
+                  <button
+                    type="button"
+                    class="nav-link d-flex gap-2 p-4 text-neutral-0"
+                    data-bs-toggle="dropdown"
+                  >
+                    <Icon
+                      class="fs-5"
+                      icon="mdi:account-circle-outline"
+                    />
+                    {{ userInfo?.name }}
+                  </button>
+                  <ul
+                    class="dropdown-menu py-3 overflow-hidden"
+                    style="right: 0; left: auto; border-radius: 20px"
+                  >
+                    <li>
+                      <NuxtLink
+                        to="/user/profile"
+                        as="a"
+                        class="dropdown-item px-6 py-4"
+                      >
+                        個人資料
+                      </NuxtLink>
+                    </li>
+                    <li>
+                      <a
+                        class="dropdown-item px-6 py-4"
+                        href="#"
+                        @click.prevent="userLogout"
+                      >登出</a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </template>
+            <template v-else>
+              <li class="nav-item">
+                <NuxtLink
+                  to="/account/login"
+                  class="nav-link p-4 text-neutral-0"
+                >
+                  會員登入
+                </NuxtLink>
+              </li>
+              <li class="nav-item">
+                <NuxtLink
+                  to="/account/signup"
+                  class="nav-link p-4 text-neutral-0"
+                >
+                  註冊
+                </NuxtLink>
+              </li>
+            </template>
             <!-- <li class="d-none d-md-block nav-item">
-              <div class="btn-group">
-                <button
-                  type="button"
-                  class="nav-link d-flex gap-2 p-4 text-neutral-0"
-                  data-bs-toggle="dropdown"
-                >
-                  <Icon 
-                    class="fs-5"
-                    icon="mdi:account-circle-outline"
-                  />
-                  Jessica
-                </button>
-                <ul
-                  class="dropdown-menu py-3 overflow-hidden"
-                  style="right: 0; left: auto; border-radius: 20px;"
-                >
-                  <li>
-                    <NuxtLink to="/user/profile" as="a" class="dropdown-item px-6 py-4">
-                      個人資料
-                    </NuxtLink>
-                  </li>
-                  <li>
-                    <a
-                      class="dropdown-item px-6 py-4"
-                      href="#"
-                    >登出</a>
-                  </li>
-                </ul>
-              </div>
+
             </li> -->
-            <li class="nav-item">
-              <NuxtLink
-                to="/account/login"
-                class="nav-link p-4 text-neutral-0"
-              >
-                會員登入
-              </NuxtLink>
-            </li>
+
             <li class="nav-item">
               <NuxtLink
                 :to="{
-                  name: 'rooms'
+                  name: 'rooms',
                 }"
                 class="btn btn-primary-100 px-8 py-4 text-white fw-bold border-0 rounded-3"
               >
@@ -134,7 +169,7 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss" scoped>
-@import "bootstrap/scss/mixins/breakpoints";
+@import 'bootstrap/scss/mixins/breakpoints';
 
 $grid-breakpoints: (
   xs: 0,
@@ -143,7 +178,7 @@ $grid-breakpoints: (
   lg: 992px,
   xl: 1200px,
   xxl: 1400px,
-  xxxl: 1537px
+  xxxl: 1537px,
 );
 
 .logo {
@@ -151,7 +186,7 @@ $grid-breakpoints: (
 }
 
 header {
-  transition: background-color .3s;
+  transition: background-color 0.3s;
 }
 
 header.scrolled {
@@ -164,9 +199,9 @@ header.scrolled {
     visibility: hidden;
 
     svg {
-      transition: opacity .3s;
+      transition: opacity 0.3s;
     }
-    
+
     svg:nth-child(1) {
       position: absolute;
       top: 28px;
@@ -197,7 +232,7 @@ header.scrolled {
     inset: 0;
     opacity: 0;
     overflow: hidden;
-    transition: opacity .05s;
+    transition: opacity 0.05s;
   }
   .navbar-collapse.show {
     opacity: 1;
@@ -216,11 +251,9 @@ header.scrolled {
 
 .dropdown-menu {
   --bs-dropdown-min-width: 16rem;
-  --bs-dropdown-link-hover-color: #BF9D7D;
-  --bs-dropdown-link-hover-bg: #F7F2EE;
+  --bs-dropdown-link-hover-color: #bf9d7d;
+  --bs-dropdown-link-hover-bg: #f7f2ee;
   --bs-dropdown-link-active-color: #fff;
-  --bs-dropdown-link-active-bg: #BF9D7D;
+  --bs-dropdown-link-active-bg: #bf9d7d;
 }
-
-
 </style>

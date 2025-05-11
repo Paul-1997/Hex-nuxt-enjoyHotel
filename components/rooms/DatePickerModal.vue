@@ -1,24 +1,24 @@
 <script setup>
-import { DatePicker } from 'v-calendar';
-import 'v-calendar/style.css';
-import { useScreens } from 'vue-screen-utils';
+import { DatePicker } from 'v-calendar'
+import 'v-calendar/style.css'
+import { useScreens } from 'vue-screen-utils'
 
-import { Icon } from '@iconify/vue';
+import { Icon } from '@iconify/vue'
 
-const { $bootstrap } = useNuxtApp();
+const { $bootstrap } = useNuxtApp()
 
-const modal = ref(null);
+const modal = ref(null)
 
 onMounted(() => {
-  modal.value =  new $bootstrap.Modal(document.getElementById('dateModal'));
+  modal.value = new $bootstrap.Modal(document.getElementById('dateModal'))
 })
 
 const openModal = () => {
-  modal.value.show();
+  modal.value.show()
 }
 
 const closeModal = () => {
-  modal.value.hide();
+  modal.value.hide()
 }
 
 defineExpose({
@@ -26,90 +26,87 @@ defineExpose({
   closeModal
 })
 
-const emit = defineEmits(['handleDateChange']);
-
+const emit = defineEmits(['handleDateChange'])
 
 const props = defineProps({
   dateTime: {
     type: Object,
-    required: true,
+    required: true
   }
 })
 
 const tempDate = reactive({
   date: {
     start: props.dateTime.date.start,
-    end: props.dateTime.date.end,
+    end: props.dateTime.date.end
   },
   minDate: props.dateTime.minDate,
   maxDate: props.dateTime.maxDate,
   key: 0
-});
+})
 
 const masks = {
   title: 'YYYY 年 MM 月',
   modelValue: 'YYYY-MM-DD'
-};
+}
 
 const { mapCurrent } = useScreens({
-  md: '768px',
-});
-
-const rows = mapCurrent({ md: 1}, 2);
-const columns = mapCurrent({ md: 2}, 1);
-const expanded = mapCurrent({ md: false}, true);
-const titlePosition = mapCurrent({ md: 'center'}, 'left');
-
-const formatDateTitle = (date) => date?.replaceAll('-', ' / ');
-
-const daysCount = computed(() => {
-  const startDate = tempDate.date.start;
-  const endDate = tempDate.date.end;
-
-  if (startDate === null || endDate === null) return 0;
-
-  const differenceTime = new Date(endDate).getTime() - new Date(startDate).getTime();
-
-  const differenceDay = Math.round(differenceTime / (1000 * 60 * 60 * 24));
-
-  return differenceDay;
+  md: '768px'
 })
 
-const MAX_BOOKING_PEOPLE = 10;
-const bookingPeopleMobile = ref(1);
+const rows = mapCurrent({ md: 1 }, 2)
+const columns = mapCurrent({ md: 2 }, 1)
+const expanded = mapCurrent({ md: false }, true)
+const titlePosition = mapCurrent({ md: 'center' }, 'left')
 
+const formatDateTitle = date => date?.replaceAll('-', ' / ')
 
-const isConfirmDateOnMobile = ref(false);
+const daysCount = computed(() => {
+  const startDate = tempDate.date.start
+  const endDate = tempDate.date.end
+
+  if (startDate === null || endDate === null) { return 0 }
+
+  const differenceTime = new Date(endDate).getTime() - new Date(startDate).getTime()
+
+  const differenceDay = Math.round(differenceTime / (1000 * 60 * 60 * 24))
+
+  return differenceDay
+})
+
+const MAX_BOOKING_PEOPLE = 10
+const bookingPeopleMobile = ref(1)
+
+const isConfirmDateOnMobile = ref(false)
 
 const confirmDateOnMobile = () => {
-  isConfirmDateOnMobile.value = true;
+  isConfirmDateOnMobile.value = true
 }
 
 const confirmDate = () => {
-  const isMobile = mapCurrent({md: false}, true);
+  const isMobile = mapCurrent({ md: false }, true)
 
   if (isMobile.value) {
     emit('handleDateChange', {
       date: tempDate.date,
       people: bookingPeopleMobile,
       daysCount
-    });
+    })
   } else {
     emit('handleDateChange', {
       date: tempDate.date,
       daysCount
-    });
+    })
   }
 
-  closeModal();
+  closeModal()
 }
 
 const clearDate = () => {
-  tempDate.date.start = null;
-  tempDate.date.end = null;
-  tempDate.key++;
+  tempDate.date.start = null
+  tempDate.date.end = null
+  tempDate.key++
 }
-
 
 </script>
 
@@ -295,7 +292,7 @@ const clearDate = () => {
             確定日期
           </button>
         </div>
-        
+
         <div
           class="d-md-none modal-footer p-3 p-md-8 pt-0 border-0"
         >
@@ -337,7 +334,6 @@ const clearDate = () => {
   </div>
 </template>
 
-
 <style lang="scss" scoped>
 .modal {
   backdrop-filter: blur(10px);
@@ -346,7 +342,6 @@ const clearDate = () => {
 .modal-dialog {
   max-width: 740px;
 }
-
 
 .date-picker :deep(.vc-primary) {
   --vc-accent-50: #f0f9ff;
@@ -361,7 +356,6 @@ const clearDate = () => {
   --vc-accent-900: #000000;
 }
 
-
 .date-picker :deep(.vc-container) {
   --vc-font-family: : "Noto Serif TC", serif;
 }
@@ -373,8 +367,6 @@ const clearDate = () => {
 .date-picker :deep(.vc-header) {
   margin-bottom: 4px;
 }
-
-
 
 .date-picker :deep(.vc-title) {
   background-color: transparent;

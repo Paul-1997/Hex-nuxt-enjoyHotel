@@ -1,14 +1,18 @@
-export default defineNuxtRouteMiddleware((to, from) => {
-  console.log('from',from.path);
-  console.log('to',to.path);
-  
-  // If the user is authenticated, continue with the route
-  const cookie = useCookie('auth');
-  console.log(cookie.value);  
-  // In a real app you would probably not redirect every route to `/`
-  // however it is important to check `to.path` before redirecting or you
-  // might get an infinite redirect loop
-  // if (to.path !== '/') {
-  //   return navigateTo('/')
-  // }
+export default defineNuxtRouteMiddleware(async (to, from) => {
+  const { checkLogin } = useUserStore()
+  try {
+    await checkLogin()
+  } catch (error) {
+    // 重新登入
+    if (error.response?.status === 403) {
+      const { isConfirmed } = await errorAlert('登入失敗', error.response?._data?.message, {
+        showCancelButton: true,
+        cancelButtonText: '稍後再說',
+        confirmButtonText: '立即登入'
+      })
+      // 如果使用者選擇了確認，則導向登入頁面
+      if (isConfirmed) { navigateTo('/account/login') }
+    } 
+    else { errorAlert() }
+  }
 })

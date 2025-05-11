@@ -6,6 +6,11 @@ export default defineNuxtConfig({
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
   },
+  runtimeConfig: {
+    public: {
+      baseURL: process.env.APP_BASEURL,
+    }
+  },
   modules: ['@pinia/nuxt', '@vee-validate/nuxt'],
   // VeeValidate module configuration
   veeValidate: {
@@ -19,4 +24,7 @@ export default defineNuxtConfig({
       ErrorMessage: 'VeeErrorMessage',
     },
   },
+  imports: {
+    dirs: ['stores']
+  }
 });

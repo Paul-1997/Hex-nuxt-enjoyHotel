@@ -1,6 +1,6 @@
 <script setup>
 
-import { Icon } from '@iconify/vue';
+import { Icon } from '@iconify/vue'
 </script>
 
 <template>
@@ -104,7 +104,7 @@ import { Icon } from '@iconify/vue';
             alt="deco-line-group"
           >
         </picture>
-        
+
         <main class="position-relative w-100 w-md-auto">
           <NuxtPage />
         </main>
@@ -150,7 +150,7 @@ $grid-breakpoints: (
     svg {
       transition: opacity .3s;
     }
-    
+
     svg:nth-child(1) {
       position: absolute;
       top: 28px;
@@ -198,7 +198,6 @@ $grid-breakpoints: (
   }
 }
 
-
 .deco-line-group {
   position: absolute;
   top: 192px;
@@ -209,6 +208,5 @@ $grid-breakpoints: (
     width: 100%;
   }
 }
-
 
 </style>

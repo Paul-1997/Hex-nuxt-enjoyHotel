@@ -1,20 +1,20 @@
 <script setup>
-import { Icon } from '@iconify/vue';
+import { Icon } from '@iconify/vue'
 
-import { Swiper, SwiperSlide } from 'swiper/vue';
-import { Autoplay, Navigation, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Autoplay, Navigation, Pagination } from 'swiper/modules'
 
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
 
-const modules = ref([Autoplay, Navigation, Pagination]);
+const modules = ref([Autoplay, Navigation, Pagination])
 
 // get room list data
-const { data } = await useAsyncData('rooms', () => $fetch('https://freyja-01v8.onrender.com/api/v1/rooms/'));
-const roomList = data.value?.result || [];
+const { data } = await useAsyncData('rooms', () => $fetch('https://freyja-01v8.onrender.com/api/v1/rooms/'))
+const roomList = data.value?.result || []
 
-console.log(roomList[0])
+// console.log(roomList[0])
 </script>
 
 <template>
@@ -29,10 +29,20 @@ console.log(roomList[0])
           disableOnInteraction: false,
         }"
       >
-        <swiper-slide v-for="(num, index) in 5" :key="index">
+        <swiper-slide
+          v-for="(num, index) in 5"
+          :key="index"
+        >
           <picture>
-            <source srcset="@/assets/images/home-hero.png" media="(min-width:576px)" />
-            <img class="hero-img" src="@/assets/images/home-hero-sm.png" alt="hero banner" />
+            <source
+              srcset="@/assets/images/home-hero.png"
+              media="(min-width:576px)"
+            >
+            <img
+              class="hero-img"
+              src="@/assets/images/home-hero-sm.png"
+              alt="hero banner"
+            >
           </picture>
         </swiper-slide>
       </swiper>
@@ -42,21 +52,34 @@ console.log(roomList[0])
       >
         <div class="d-flex flex-column align-items-center text-center d-md-block text-md-start">
           <div class="mt-10 mb-5 mt-md-0 mb-md-10 text-primary-100 fw-bold">
-            <h2 class="fw-semibold">享樂酒店</h2>
-            <h5 class="fs-7 fs-md-5 fw-semibold">Enjoyment Luxury Hotel</h5>
+            <h2 class="fw-semibold">
+              享樂酒店
+            </h2>
+            <h5 class="fs-7 fs-md-5 fw-semibold">
+              Enjoyment Luxury Hotel
+            </h5>
           </div>
           <div class="deco-line" />
         </div>
-        <h1 class="mb-0 text-neutral-0 fw-bold">客房旅宿</h1>
+        <h1 class="mb-0 text-neutral-0 fw-bold">
+          客房旅宿
+        </h1>
       </div>
     </section>
 
     <section class="py-10 py-md-30 bg-primary-10">
       <div class="container mb-md-12">
-        <h4 class="mb-2 mb-md-4 fs-8 fs-md-6 fw-bold text-neutral-80">房型選擇</h4>
-        <h2 class="mb-10 mb-md-20 fs-1 fw-bold text-primary-100">各種房型，任您挑選</h2>
+        <h4 class="mb-2 mb-md-4 fs-8 fs-md-6 fw-bold text-neutral-80">
+          房型選擇
+        </h4>
+        <h2 class="mb-10 mb-md-20 fs-1 fw-bold text-primary-100">
+          各種房型，任您挑選
+        </h2>
         <ul class="d-flex flex-column gap-6 gap-md-12 list-unstyled">
-          <li v-for="room in roomList" class="card flex-lg-row border-0 rounded-3xl overflow-hidden">
+          <li
+            v-for="room in roomList"
+            class="card flex-lg-row border-0 rounded-3xl overflow-hidden"
+          >
             <div class="row">
               <div class="col-12 col-lg-7">
                 <swiper
@@ -69,15 +92,21 @@ console.log(roomList[0])
                     disableOnInteraction: false,
                   }"
                 >
-                  <swiper-slide v-for="(url, index) in room.imageUrlList" :key="index">
+                  <swiper-slide
+                    v-for="(url, index) in room.imageUrlList"
+                    :key="index"
+                  >
                     <picture>
-                      <source :srcset="url" media="(min-width: 768px)" />
+                      <source
+                        :srcset="url"
+                        media="(min-width: 768px)"
+                      >
                       <img
                         class="w-100 object-fit-cover"
                         :src="url"
                         loading="lazy"
                         :alt="`room-a-${index}`"
-                      />
+                      >
                     </picture>
                   </swiper-slide>
                 </swiper>
@@ -88,27 +117,44 @@ console.log(roomList[0])
                     {{ room.name }}
                   </h3>
                   <p class="card-text mb-6 mb-md-10 fs-8 fs-md-7 fw-medium text-neutral-80">
-                    {{  room.description }}
+                    {{ room.description }}
                   </p>
                   <ul class="d-flex gap-4 mb-6 mb-md-10 list-unstyled">
                     <li class="card-info px-4 py-5 border border-primary-40 rounded-3">
-                      <Icon class="mb-2 fs-5 text-primary-100" icon="fluent:slide-size-24-filled" />
-                      <p class="mb-0 fw-bold text-neutral-80 text-nowrap">{{ room.areaInfo }}</p>
+                      <Icon
+                        class="mb-2 fs-5 text-primary-100"
+                        icon="fluent:slide-size-24-filled"
+                      />
+                      <p class="mb-0 fw-bold text-neutral-80 text-nowrap">
+                        {{ room.areaInfo }}
+                      </p>
                     </li>
                     <li class="card-info px-4 py-5 border border-primary-40 rounded-3">
-                      <Icon class="mb-2 fs-5 text-primary-100" icon="material-symbols:king-bed" />
-                      <p class="mb-0 fw-bold text-neutral-80 text-nowrap">{{  room.bedInfo }}</p>
+                      <Icon
+                        class="mb-2 fs-5 text-primary-100"
+                        icon="material-symbols:king-bed"
+                      />
+                      <p class="mb-0 fw-bold text-neutral-80 text-nowrap">
+                        {{ room.bedInfo }}
+                      </p>
                     </li>
                     <li class="card-info px-4 py-5 border border-primary-40 rounded-3">
-                      <Icon class="mb-2 fs-5 text-primary-100" icon="ic:baseline-person" />
-                      <p class="mb-0 fw-bold text-neutral-80 text-nowrap">2-{{room.maxPeople}} 人</p>
+                      <Icon
+                        class="mb-2 fs-5 text-primary-100"
+                        icon="ic:baseline-person"
+                      />
+                      <p class="mb-0 fw-bold text-neutral-80 text-nowrap">
+                        2-{{ room.maxPeople }} 人
+                      </p>
                     </li>
                   </ul>
                   <div class="deco-line w-100 mb-6 mb-md-10" />
                   <div class="d-flex justify-content-between align-items-center fs-7 fs-md-5 text-primary-100">
-                    <p class="mb-0 fw-bold">$NT{{ room.price }}</p>
+                    <p class="mb-0 fw-bold">
+                      $NT{{ room.price }}
+                    </p>
                     <NuxtLink
-                    :to="{
+                      :to="{
                         name: 'rooms-roomId',
                         params: {
                           roomId: room._id,
@@ -116,7 +162,10 @@ console.log(roomList[0])
                       }"
                       class="icon-link icon-link-hover text-primary-100"
                     >
-                      <Icon class="bi fs-5" icon="mdi:arrow-right" />
+                      <Icon
+                        class="bi fs-5"
+                        icon="mdi:arrow-right"
+                      />
                     </NuxtLink>
                   </div>
                 </div>
@@ -127,7 +176,6 @@ console.log(roomList[0])
       </div>
     </section>
   </main>
-
 </template>
 <style lang="scss" scoped>
 @import 'bootstrap/scss/mixins/breakpoints';

@@ -1,10 +1,10 @@
-export default function debounc(callback , delay = 350) {
-  let timer;
+export default function debounc (callback, delay = 350) {
+  let timer
   return (...args) => {
-    if (timer) clearTimeout(timer);
+    if (timer) { clearTimeout(timer) }
 
     timer = setTimeout(() => {
-      callback(...args);
-    }, delay);
-  };
+      callback(...args)
+    }, delay)
+  }
 }

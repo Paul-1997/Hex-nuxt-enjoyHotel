@@ -1,39 +1,38 @@
 <script setup>
-import { Icon } from '@iconify/vue';
+import { Icon } from '@iconify/vue'
 
-import { Swiper, SwiperSlide } from 'swiper/vue';
-import { Autoplay, Navigation, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Autoplay, Navigation, Pagination } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
 
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+const modules = ref([Autoplay, Navigation, Pagination])
 
-const modules = ref([Autoplay, Navigation, Pagination]);
-
-const roomSwiper = ref(null);
+const roomSwiper = ref(null)
 
 const slidePrev = () => {
-  roomSwiper.value.$el.swiper.slidePrev();
-};
+  roomSwiper.value.$el.swiper.slidePrev()
+}
 const slideNext = () => {
-  roomSwiper.value.$el.swiper.slideNext();
-};
+  roomSwiper.value.$el.swiper.slideNext()
+}
 
 // get all needed data
 const { data } = await useAsyncData('homeData', async () => {
   const callAPi = [
     $fetch('https://freyja-01v8.onrender.com/api/v1/home/news'),
     $fetch('https://freyja-01v8.onrender.com/api/v1/rooms/'),
-    $fetch('https://freyja-01v8.onrender.com/api/v1/home/culinary'),
-  ];
-  const data = await Promise.allSettled(callAPi);
-  return data;
-});
+    $fetch('https://freyja-01v8.onrender.com/api/v1/home/culinary')
+  ]
+  const data = await Promise.allSettled(callAPi)
+  return data
+})
 // 取最前面三筆
-const newsData = data.value[0]?.value?.result.slice(0,3) || [];
+const newsData = data.value[0]?.value?.result.slice(0, 3) || []
 // 先指名第一個，後續再考慮是否採用隨機選取
-const roomIntro = data.value[1]?.value?.result[0] || {};
-const culinaryData = data.value[2]?.value?.result || [];
+const roomIntro = data.value[1]?.value?.result[0] || {}
+const culinaryData = data.value[2]?.value?.result || []
 </script>
 <template>
   <main class="overflow-hidden">
@@ -48,10 +47,20 @@ const culinaryData = data.value[2]?.value?.result || [];
           disableOnInteraction: false,
         }"
       >
-        <swiper-slide v-for="(num, index) in 5" :key="index">
+        <swiper-slide
+          v-for="(num, index) in 5"
+          :key="index"
+        >
           <picture>
-            <source srcset="@/assets/images/home-hero.png" media="(min-width:576px)" />
-            <img class="hero-img" src="@/assets/images/home-hero-sm.png" alt="hero banner" />
+            <source
+              srcset="@/assets/images/home-hero.png"
+              media="(min-width:576px)"
+            >
+            <img
+              class="hero-img"
+              src="@/assets/images/home-hero-sm.png"
+              alt="hero banner"
+            >
           </picture>
         </swiper-slide>
       </swiper>
@@ -62,14 +71,20 @@ const culinaryData = data.value[2]?.value?.result || [];
         <div class="d-flex flex-column align-items-center text-center d-md-block text-md-start">
           <div class="mt-10 mb-5 mt-md-0 mb-md-10 text-primary-100 fw-bold">
             <h2>享樂酒店</h2>
-            <h5 class="mb-0 fs-7 fs-md-5">Enjoyment Luxury Hotel</h5>
+            <h5 class="mb-0 fs-7 fs-md-5">
+              Enjoyment Luxury Hotel
+            </h5>
           </div>
           <div class="deco-line" />
         </div>
         <div class="hero__intro position-relative">
           <div class="hero__intro-content">
-            <h1 class="mb-6 text-white fw-bold text-nowrap">高雄<br />豪華住宿之選</h1>
-            <p class="text-neutral-40 fw-semibold">我們致力於為您提供無與倫比的奢華體驗與優質服務</p>
+            <h1 class="mb-6 text-white fw-bold text-nowrap">
+              高雄<br>豪華住宿之選
+            </h1>
+            <p class="text-neutral-40 fw-semibold">
+              我們致力於為您提供無與倫比的奢華體驗與優質服務
+            </p>
             <RouterLink
               to="/rooms"
               class="btn btn-neutral-0 d-flex justify-content-end align-items-center gap-3 w-100 text-end text-neutral-100 fs-5 fw-semibold border-0"
@@ -87,20 +102,35 @@ const culinaryData = data.value[2]?.value?.result || [];
         <div class="row">
           <div class="col-12 col-md-2">
             <div class="mb-10 mb-md-0">
-              <h2 class="mb-6 mb-md-10 fs-1 fw-bold text-primary-100">最新<br />消息</h2>
+              <h2 class="mb-6 mb-md-10 fs-1 fw-bold text-primary-100">
+                最新<br>消息
+              </h2>
               <div class="deco-line" />
             </div>
           </div>
           <div class="col-12 col-md-10 d-flex flex-column gap-10">
             <!-- 只取前三個 -->
-            <div class="card bg-transparent border-0" v-for="news in newsData" :key="news.id">
+            <div
+              v-for="news in newsData"
+              :key="news.id"
+              class="card bg-transparent border-0"
+            >
               <div class="d-flex flex-column flex-md-row align-items-center gap-6">
                 <picture>
-                  <source :srcset="news.image" media="(min-width: 576px)" />
-                  <img :src="news.image" class="w-100 rounded-3" :alt="news.title" />
+                  <source
+                    :srcset="news.image"
+                    media="(min-width: 576px)"
+                  >
+                  <img
+                    :src="news.image"
+                    class="w-100 rounded-3"
+                    :alt="news.title"
+                  >
                 </picture>
                 <div class="card-body p-0">
-                  <h3 class="card-title mb-2 mb-md-6 fw-bold">{{ news.title }}</h3>
+                  <h3 class="card-title mb-2 mb-md-6 fw-bold">
+                    {{ news.title }}
+                  </h3>
                   <p class="card-text text-neutral-80 fs-8 fs-md-7 fw-medium">
                     {{ news.description }}
                   </p>
@@ -116,18 +146,20 @@ const culinaryData = data.value[2]?.value?.result || [];
       <div class="container p-0">
         <div class="about-content p-6 p-md-20 mt-10 ms-10 me-5 mt-md-20 mx-md-auto text-neutral-0">
           <div class="d-flex align-items-center gap-10 mb-10 mb-md-20">
-            <h2 class="text-nowrap mb-0 fs-1 fw-bold">關於<br />我們</h2>
+            <h2 class="text-nowrap mb-0 fs-1 fw-bold">
+              關於<br>我們
+            </h2>
             <div class="deco-line" />
           </div>
           <div class="d-flex flex-column gap-4 gap-md-10 fw-medium">
             <p class="mb-0 fs-8 fs-md-7">
               享樂酒店，位於美麗島高雄的心臟地帶，是這座城市的璀璨瑰寶與傲人地標。
-              <br />
+              <br>
               我們的存在，不僅僅是為了提供奢華的住宿體驗，更是為了將高雄的美麗與活力，獻給每一位蒞臨的旅客。
             </p>
             <p class="mb-0 fs-8 fs-md-7">
               我們的酒店，擁有時尚典雅的裝潢，每一個細節都充滿著藝術與設計的精緻。
-              <br />
+              <br>
               我們的員工，都以熱情的服務與專業的態度，讓每一位客人都能感受到賓至如歸的溫暖。
             </p>
             <p class="mb-0 fs-8 fs-md-7">
@@ -156,18 +188,34 @@ const culinaryData = data.value[2]?.value?.result || [];
           }"
           :loop="true"
         >
-          <swiper-slide v-for="(image, index) in roomIntro.imageUrlList" :key="image">
+          <swiper-slide
+            v-for="(image, index) in roomIntro.imageUrlList"
+            :key="image"
+          >
             <picture>
-              <source :srcset="image" media="(min-width:768px)" />
-              <img class="w-100" :src="image" :alt="`room-intro pic ${index}`" />
+              <source
+                :srcset="image"
+                media="(min-width:768px)"
+              >
+              <img
+                class="w-100"
+                :src="image"
+                :alt="`room-intro pic ${index}`"
+              >
             </picture>
           </swiper-slide>
         </swiper>
 
         <div class="room-intro-content text-neutral-0">
-          <h2 class="mb-2 mb-md-4 fw-bold">{{ roomIntro.name }}</h2>
-          <p class="mb-6 mb-md-10 fs-8 fs-md-7">{{ roomIntro.description }}</p>
-          <div class="mb-6 mb-md-10 fs-3 fw-bold">NT$ {{ roomIntro.price }}</div>
+          <h2 class="mb-2 mb-md-4 fw-bold">
+            {{ roomIntro.name }}
+          </h2>
+          <p class="mb-6 mb-md-10 fs-8 fs-md-7">
+            {{ roomIntro.description }}
+          </p>
+          <div class="mb-6 mb-md-10 fs-3 fw-bold">
+            NT$ {{ roomIntro.price }}
+          </div>
           <RouterLink
             to="/rooms"
             class="btn btn-neutral-0 d-flex justify-content-end align-items-center gap-3 w-100 p-5 p-md-10 mb-6 mb-md-10 text-end text-neutral-100 fs-7 fs-md-5 fw-bold border-0"
@@ -192,7 +240,11 @@ const culinaryData = data.value[2]?.value?.result || [];
               type="button"
               @click="slideNext"
             >
-              <Icon icon="mdi:arrow-right" class="bi m-4" style="font-size: 1.5rem" />
+              <Icon
+                icon="mdi:arrow-right"
+                class="bi m-4"
+                style="font-size: 1.5rem"
+              />
             </button>
           </div>
         </div>
@@ -202,19 +254,34 @@ const culinaryData = data.value[2]?.value?.result || [];
     <section class="delicacy position-relative py-20 py-md-30 bg-primary-10">
       <div class="container">
         <div class="d-flex align-items-center gap-10 mb-10 mb-md-20">
-          <h2 class="mb-0 fs-1 fw-bold text-primary-100">佳餚<br />美饌</h2>
+          <h2 class="mb-0 fs-1 fw-bold text-primary-100">
+            佳餚<br>美饌
+          </h2>
           <div class="deco-line" />
         </div>
         <div class="row flex-nowrap overflow-x-auto">
-          <div class="col-10 col-md-6 col-xl-4" v-for="culinary in culinaryData" :key="culinary.id">
+          <div
+            v-for="culinary in culinaryData"
+            :key="culinary.id"
+            class="col-10 col-md-6 col-xl-4"
+          >
             <div class="card position-relative border-0 rounded-3">
               <picture>
-                <source :srcset="culinary.image" media="(min-width: 576px)" />
-                <img class="w-100 rounded-3" :src="culinary.image_mobile" :alt="culinary.title" />
+                <source
+                  :srcset="culinary.image"
+                  media="(min-width: 576px)"
+                >
+                <img
+                  class="w-100 rounded-3"
+                  :src="culinary.image_mobile"
+                  :alt="culinary.title"
+                >
               </picture>
               <div class="card-body position-absolute bottom-0 p-4 p-md-6 rounded-bottom-3 text-neutral-0">
                 <div class="d-flex justify-content-between align-items-center mb-4 mb-md-6">
-                  <h5 class="card-title mb-0 fw-bold">{{ culinary.title }}</h5>
+                  <h5 class="card-title mb-0 fw-bold">
+                    {{ culinary.title }}
+                  </h5>
                   <div class="d-flex justify-content-between gap-4 text-neutral-40 fs-8 fs-md-7">
                     <span class="fw-bold">{{ culinary.diningTime.split(' ')[0] }}</span>
                     <span class="fw-bold">{{ culinary.diningTime.split(' ')[1] }}</span>
@@ -233,34 +300,60 @@ const culinaryData = data.value[2]?.value?.result || [];
     <section class="transportation bg-neutral-120">
       <div class="container pt-20 pb-10 pt-md-30 pb-md-20">
         <div class="d-flex align-items-center gap-10 mb-10 mb-md-20">
-          <h2 class="mb-0 fs-1 fw-bold text-primary-100">交通<br />方式</h2>
+          <h2 class="mb-0 fs-1 fw-bold text-primary-100">
+            交通<br>方式
+          </h2>
           <div class="deco-line" />
         </div>
         <div class="row gap-6 gap-md-0">
           <div class="col-12 mb-md-10">
-            <p class="text-neutral-40 fw-bold">台灣高雄市新興區六角路123號</p>
+            <p class="text-neutral-40 fw-bold">
+              台灣高雄市新興區六角路123號
+            </p>
             <picture>
-              <source srcset="@/assets/images/home-map.png" media="(min-width: 576px)" />
-              <img class="w-100" src="@/assets/images/home-map-sm.png" alt="描述地圖中酒店所在的位置" />
+              <source
+                srcset="@/assets/images/home-map.png"
+                media="(min-width: 576px)"
+              >
+              <img
+                class="w-100"
+                src="@/assets/images/home-map-sm.png"
+                alt="描述地圖中酒店所在的位置"
+              >
             </picture>
           </div>
           <div class="col-12 col-md-4 text-neutral-0">
-            <Icon class="mb-2 mb-md-4 display-1 text-primary-100" icon="ic:baseline-directions-car" />
-            <h5 class="fs-7 fs-md-5 fw-bold">自行開車</h5>
+            <Icon
+              class="mb-2 mb-md-4 display-1 text-primary-100"
+              icon="ic:baseline-directions-car"
+            />
+            <h5 class="fs-7 fs-md-5 fw-bold">
+              自行開車
+            </h5>
             <p class="mb-0 fs-8 fs-md-7">
               如果您選擇自行開車，可以透過國道一號下高雄交流道，往市區方向行駛，並依路標指示即可抵達「享樂酒店」。飯店內設有停車場，讓您停車方便。
             </p>
           </div>
           <div class="col-12 col-md-4 text-neutral-0">
-            <Icon class="mb-2 mb-md-4 display-1 text-primary-100" icon="ic:baseline-train" />
-            <h5 class="fs-7 fs-md-5 fw-bold">高鐵/火車</h5>
+            <Icon
+              class="mb-2 mb-md-4 display-1 text-primary-100"
+              icon="ic:baseline-train"
+            />
+            <h5 class="fs-7 fs-md-5 fw-bold">
+              高鐵/火車
+            </h5>
             <p class="mb-0 fs-8 fs-md-7">
               如果您是搭乘高鐵或火車，可於左營站下車，外頭有計程車站，搭乘計程車約20分鐘即可抵達。或者您也可以轉乘捷運紅線至中央公園站下車，步行約10分鐘便可抵達。
             </p>
           </div>
           <div class="col-12 col-md-4 text-neutral-0">
-            <Icon class="mb-2 mb-md-4 display-1 text-primary-100" icon="mdi:car-side" />
-            <h5 class="fs-7 fs-md-5 fw-bold">禮賓車服務</h5>
+            <Icon
+              class="mb-2 mb-md-4 display-1 text-primary-100"
+              icon="mdi:car-side"
+            />
+            <h5 class="fs-7 fs-md-5 fw-bold">
+              禮賓車服務
+            </h5>
             <p class="mb-0 fs-8 fs-md-7">
               承億酒店提供禮賓專車接送服務，但因目的地遠近會有不同的收費，請撥打電話將由專人為您服務洽詢專線：(07)123-4567
             </p>
@@ -268,8 +361,15 @@ const culinaryData = data.value[2]?.value?.result || [];
         </div>
       </div>
       <picture>
-        <source srcset="@/assets/images/deco-line-group-horizontal-full.svg" media="(min-width:576px)" />
-        <img class="w-100" src="@/assets/images/deco-line-group-horizontal-sm.svg" alt="deco-line-group" />
+        <source
+          srcset="@/assets/images/deco-line-group-horizontal-full.svg"
+          media="(min-width:576px)"
+        >
+        <img
+          class="w-100"
+          src="@/assets/images/deco-line-group-horizontal-sm.svg"
+          alt="deco-line-group"
+        >
       </picture>
     </section>
   </main>

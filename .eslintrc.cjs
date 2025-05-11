@@ -1,10 +1,11 @@
 /* eslint-env node */
 module.exports = {
   root: true,
-  'extends': [
+  extends: [
+    'plugin:nuxt/recommended',
     'plugin:vue/vue3-recommended',
-    'eslint:recommended',
-    'plugin:prettier/recommended'
+    'eslint:recommended'
+    // 'plugin:prettier/recommended'
   ],
   parserOptions: {
     ecmaVersion: 'latest'
@@ -18,8 +19,13 @@ module.exports = {
         bracketSpacing: true,
         singleQuote: true,
         printWidth: 120,
-        trailingComma: 'all',
-      },
-    ],
+        trailingComma: 'all'
+      }
+    ]
+  },
+  rules: {
+    'no-undef': 'off',
+    "vue/multi-word-component-names": "off",
+    
   }
 }
