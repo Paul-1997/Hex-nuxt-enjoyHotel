@@ -32,6 +32,10 @@ const props = defineProps({
   dateTime: {
     type: Object,
     required: true
+  },
+  maxBookingPeople: {
+    type: Number,
+    default: 4
   }
 })
 
@@ -74,7 +78,6 @@ const daysCount = computed(() => {
   return differenceDay
 })
 
-const MAX_BOOKING_PEOPLE = 10
 const bookingPeopleMobile = ref(1)
 
 const isConfirmDateOnMobile = ref(false)
@@ -260,7 +263,7 @@ const clearDate = () => {
                 :class="{
                   'disabled bg-neutral-40':
                     bookingPeopleMobile ===
-                    MAX_BOOKING_PEOPLE
+                    maxBookingPeople
                 }"
                 class="btn btn-neutral-0 p-4 border border-neutral-40 rounded-circle"
                 type="button"
@@ -287,6 +290,7 @@ const clearDate = () => {
           <button
             type="button"
             class="btn btn-primary-100 flex-grow-1 flex-md-grow-0 px-8 py-4 text-neutral-0 fw-bold rounded-3"
+            :disabled="daysCount <= 0"
             @click="confirmDate"
           >
             確定日期
@@ -323,6 +327,7 @@ const clearDate = () => {
             <button
               type="button"
               class="btn btn-primary-100 flex-grow-1 flex-md-grow-0 px-8 py-4 text-neutral-0 fw-bold rounded-3"
+              :disabled="daysCount <= 0"
               @click="confirmDateOnMobile"
             >
               確定日期

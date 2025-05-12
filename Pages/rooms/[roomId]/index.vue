@@ -58,7 +58,7 @@ const countRoomPrice = computed(() => {
   return roomDetail.price * daysDiff.value;
 })
 
-const headToleBooking = () => {
+const headToBooking = () => {
   
   if(!bookingData.value.checkOutDate) return false
   bookingData.value.roomId = roomDetail._id;
@@ -367,7 +367,7 @@ const headToleBooking = () => {
                 class="btn btn-primary-100 px-12 py-4 text-neutral-0 fw-bold rounded-3" 
                 :class="{ 'disabled' : !bookingData?.checkOutDate }"
                 :disabled=" !bookingData?.checkOutDate && daysDiff < 0"
-                @click.prevent="headToleBooking()"
+                @click.prevent="headToBooking()"
               >
                 立即預訂
               </button>
@@ -379,7 +379,7 @@ const headToleBooking = () => {
       <div
         class="d-flex d-md-none justify-content-between align-items-center position-fixed bottom-0 w-100 p-3 bg-neutral-0"
       >
-        <template v-if=" bookingData.value?.end === null">
+        <template v-if="!bookingData?.checkOutDate">
           <small class="text-neutral-80 fw-medium">NT$ {{ roomDetail.price }} / 晚</small>
           <button
             class="btn btn-primary-100 px-12 py-4 text-neutral-0 fw-bold rounded-3"
@@ -400,7 +400,7 @@ const headToleBooking = () => {
             class="btn btn-primary-100 px-12 py-4 text-neutral-0 fw-bold rounded-3" 
             :class="{ 'disabled' : !bookingData?.checkOutDate }"
             :disabled=" !bookingData?.checkOutDate && daysDiff < 0"
-            @click.prevent="handleBooking()"
+            @click.prevent="headToBooking()"
           >
             立即預訂
           </button>
@@ -412,6 +412,7 @@ const headToleBooking = () => {
       <DatePickerModal
         ref="datePickerModal"
         :date-time="bookingDate"
+        :max-booking-people="MAX_BOOKING_PEOPLE"
         @handle-date-change="handleDateChange"
       />
     </ClientOnly>
