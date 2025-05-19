@@ -4,8 +4,8 @@ definePageMeta({
 })
 const { errorAlert } = useAlert()
 // login
-const { userLogin, checkLogin } = useUserStore()
-
+const { userLogin } = useUserStore()
+const route = useRoute();
 const account = reactive({
   email: '',
   password: ''
@@ -16,9 +16,10 @@ const handleLogin = async () => {
   try {
     await userLogin(account)
     if (rememberAccount.value === true) { localStorage.setItem('HotelUserEmail', account.email) }
-    navigateTo('/')
+    // 確認一下是否要重新導向
+    const path = route.query.redirectURL ? route.query.redirectURL : '/';
+    navigateTo(path);
   } catch (error) {
-    console.log(error?.response)
     errorAlert('登入失敗', error?.response?._data.message)
   }
 }

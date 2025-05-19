@@ -26,12 +26,13 @@ const formatDate = (date) => {
 }
 const bookingDate = reactive({
   date: {
-    start: formatDate(currentDate),
-    end: null
+    start: bookingData.value.checkInDate || formatDate(currentDate),
+    end: bookingData.value.checkOutDate || null
   },
   minDate: new Date(),
   maxDate: new Date(currentDate.setFullYear(currentDate.getFullYear() + 1))
 })
+
 
 
 const MAX_BOOKING_PEOPLE = roomDetail.maxPeople ?? 10;
@@ -43,14 +44,14 @@ function handleDateChange(bookingInfo) {
   daysDiff.value = bookingInfo.daysCount.value;
 }
 watch(bookingData.value,() => {
-  if( !bookingData.value ) return
+  if( !bookingData ) return
   const { checkInDate:start, checkOutDate:end } = bookingData.value;
     bookingDate.date.start = start ?? formatDate(currentDate);
     bookingDate.date.end = end ?? null;
 })
 // chunk images
 const chunkImages = (imageArr, size) => {
-  if (!imageArr.length) { return [] }
+  if (!imageArr || !imageArr.length) { return [] }
   return [imageArr.slice(0, size), ...chunkImages(imageArr.slice(size), size)]
 }
 const countRoomPrice = computed(() => {
@@ -103,6 +104,7 @@ const headToBooking = () => {
           class="position-absolute btn btn-primary-10 px-8 py-4 me-3 text-primary-100 border-primary-100 fw-bold rounded-3"
           style="bottom: 40px; right: 40px"
           type="button"
+          @click="navigateTo('/rooms')"
         >
           看更多
         </button>

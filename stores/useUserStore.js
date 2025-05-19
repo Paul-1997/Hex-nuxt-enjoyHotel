@@ -16,7 +16,6 @@ const useUserStore = defineStore('userStore', () => {
       }
     })
     isLogin.value = res.status
-    return isLogin.value
   }
   const userLogin = async (account) => {
     const { token } = await $fetch('user/login', {

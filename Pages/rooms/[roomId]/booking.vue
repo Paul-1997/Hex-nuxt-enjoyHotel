@@ -1,7 +1,11 @@
 <script setup>
 import zipcodeSelector from '~/components/zipcodeSelector.vue';
 import BookingLoading from '~/components/rooms/BookingLoading.vue';
+import DatePickerModal from '@/components/rooms/DatePickerModal.vue'
 import { Icon } from '@iconify/vue';
+
+definePageMeta({ middleware: 'auth'});
+
 
 const route = useRoute();
 const router = useRouter();
@@ -11,7 +15,10 @@ const { bookingData, daysDiff } = storeToRefs(bookingStore);
 const { getUserInfo, checkLogin } = useUserStore();
 const { userInfo } = storeToRefs(useUserStore());
 const goBack = () => {
-  router.back();
+  const roomId = route.path.split('/')[2];
+  const path = roomId === roomDetail._id ? `/rooms/${roomId}` : `/rooms/${roomDetail._id}`;
+  
+  router.push(path);
 };
 
 const isLoading = ref(false);
@@ -21,7 +28,6 @@ const confirmBooking = async () => {
   // 先做表單驗證
   if (!await checkFromValidate()) return;
   // 訂單資訊驗證
-  console.log(checkOrderValidate());
   if (checkOrderValidate()) {
     isLoading.value = true;
     // 送出訂單
@@ -33,6 +39,8 @@ const confirmBooking = async () => {
         peopleNum: bookingData.value.peopleNum,
         userInfo: { ...userInfo.value }
       })
+      const data = await getBookingOrders();
+      console.log(data);
     } 
     catch (error) {
       errorAlert('訂房失敗', error?.response?._data.message)
@@ -78,11 +86,12 @@ const handleAddressUpdate = (data) => {
   formData.address.county = data.county;
   zipCode.value = "";
 };
-//
-const { data } = await useAsyncData('room', () =>
-  $fetch(`https://freyja-01v8.onrender.com/api/v1/rooms/${route.params.roomId}`),
-);
-const roomDetail = data.value?.result || {};
+const { data, refresh } = await useAsyncData('room', () => {
+  const roomId = route.params.roomId;
+  return $fetch(`https://freyja-01v8.onrender.com/api/v1/rooms/${roomId}`);
+});
+const roomDetail = ref({});
+roomDetail.value = data.value.result;
 const formatDate = (v) => {
   const date = new Date(v);
   const MONTH = date.getMonth() + 1;
@@ -117,14 +126,61 @@ const checkUserLogin = async () => {
   }
 }
 
+// 訂單編輯
+const isBookingRoomEdit = ref(false);
+const isBookingDateEdit = ref(false);
+const isBookingPeopleEdit = ref(false);
+let roomArr = ref([]);
+const edit_selectedRoom = ref("");
+
+const currDate = new Date();
+const edit_selectedDate = reactive({
+  date: {
+    start: bookingData.value.checkInDate,
+    end: bookingData.value.checkOutDate
+  },
+  minDate: new Date(),
+  maxDate: new Date(currDate.setFullYear(currDate.getFullYear() + 1))
+})
+// ROOM
+watchEffect(async ()=> {
+  if(isBookingRoomEdit.value && !roomArr.length){
+    const { result } = await $fetch(`https://freyja-01v8.onrender.com/api/v1/rooms/`);
+    roomArr.value = result.map(room => {
+      const {name , _id } = room;
+      return { name, _id };
+    })
+    edit_selectedRoom.value = route.params.roomId;
+  }
+})
+const handleEditRoom = async () => {
+  if( edit_selectedRoom.value === route.params.roomId) return 
+  route.params.roomId = edit_selectedRoom.value;
+  // 重新取得房間相關資料
+  await refresh();
+  // 記得要重新賦值
+  roomDetail.value = data.value.result;
+  isBookingRoomEdit.value = false;
+}
+// date
+const datePickerModal = ref(null);
+
+const editDate = () => {
+  isBookingDateEdit.value = true;
+  datePickerModal.value.openModal();
+}
+
+const handleEditDate = (editedDate) => {
+  const { start, end } = editedDate.date;
+  bookingData.value.checkInDate = start;
+  bookingData.value.checkOutDate = end;
+  daysDiff.value = editedDate.daysCount.value;
+}
+
+
 //進入頁面時察看是否有預定套房資料，若沒有就導回房間預定頁面
 onMounted(async () => {
-  if (!bookingData.value.checkInDate || !bookingData.value.checkOutDate) {
-    const path = route.path.split('/').slice(0, -1).join('/');
-    router.push(path);
-  }
-await getBookingOrders();
-
+  if (!bookingData.value.checkInDate || !bookingData.value.checkOutDate) goBack()
 })
 
 </script>
@@ -153,7 +209,10 @@ await getBookingOrders();
                 訂房資訊
               </h2>
               <div class="d-flex flex-column gap-6">
-                <div class="d-flex justify-content-between align-items-center text-neutral-100">
+                <div
+                  v-if="!isBookingRoomEdit"
+                  class="d-flex justify-content-between align-items-center text-neutral-100"
+                >
                   <div>
                     <h3 class="title-deco mb-2 fs-7 fw-bold">
                       選擇房型
@@ -165,11 +224,44 @@ await getBookingOrders();
                   <button
                     class="bg-transparent border-0 fw-bold text-decoration-underline"
                     type="button"
+                    @click="isBookingRoomEdit = true"
                   >
                     編輯
                   </button>
                 </div>
-                <div class="d-flex justify-content-between align-items-center text-neutral-100">
+                <div v-else>
+                  <h3 class="title-deco mb-2 fs-7 fw-bold">
+                    選擇房型
+                  </h3>
+                  <div class="d-flex w-100 align-items-center justify-content-between"> 
+                    <select
+                      id="editRoom"
+                      v-model="edit_selectedRoom"
+                      class="form-select"
+                      aria-label="select peopleNum"
+                      style="width: fit-content;"
+                    >
+                      <option
+                        v-for="room in roomArr"
+                        :key="room._id"
+                        :value="room._id"
+                      >
+                        {{ room.name }}
+                      </option>
+                    </select>
+                    <button
+                      class="btn btn btn-primary-100 text-neutral-0 border-0 fw-bold"
+                      type="button"
+                      @click.prevent="handleEditRoom()"
+                    >
+                      確定
+                    </button>
+                  </div> 
+                </div>
+
+                <div
+                  class="d-flex justify-content-between align-items-center text-neutral-100"
+                >
                   <div>
                     <h3 class="title-deco mb-2 fs-7 fw-bold">
                       訂房日期
@@ -184,11 +276,15 @@ await getBookingOrders();
                   <button
                     class="bg-transparent border-0 fw-bold text-decoration-underline"
                     type="button"
+                    @click="editDate"
                   >
                     編輯
                   </button>
                 </div>
-                <div class="d-flex justify-content-between align-items-center text-neutral-100">
+                <div
+                  v-if="!isBookingPeopleEdit"
+                  class="d-flex justify-content-between align-items-center text-neutral-100"
+                >
                   <div>
                     <h3 class="title-deco mb-2 fs-7 fw-bold">
                       房客人數
@@ -200,9 +296,42 @@ await getBookingOrders();
                   <button
                     class="bg-transparent border-0 fw-bold text-decoration-underline"
                     type="button"
+                    @click="isBookingPeopleEdit = true"
                   >
                     編輯
                   </button>
+                </div>
+                <div v-else>
+                  <h3 class="title-deco mb-2 fs-7 fw-bold">
+                    房客人數
+                  </h3>
+                  <div
+                    class="d-flex justify-content-between align-items-center text-neutral-100"
+                  >
+                    <div class="d-flex align-items-center gap-4">
+                      <select
+                        id="peopleNum"
+                        v-model="bookingData.peopleNum"
+                        class="form-select"
+                        aria-label="select peopleNum"
+                      >
+                        <option
+                          v-for="num in roomDetail.maxPeople"
+                          :key="num"
+                          :value="num"
+                        >
+                          {{ num }} 人
+                        </option>
+                      </select>
+                    </div>
+                    <button
+                      class="btn btn btn-primary-100 text-neutral-0 border-0 fw-bold"
+                      type="button"
+                      @click="isBookingPeopleEdit = false"
+                    >
+                      確定
+                    </button>
+                  </div>
                 </div>
               </div>
             </section>
@@ -483,7 +612,7 @@ await getBookingOrders();
                   </p>
                   <!-- $ {{ 1000 * daysDiff }}  -->
                   <span
-                    v-currency="1000 * daysDiff"
+                    v-currency.negative="userInfo?._id ? 1000 * daysDiff : 0"
                     class="text-primary-100"
                   > -NT</span>
                 </div>
@@ -512,6 +641,14 @@ await getBookingOrders();
     </section>
 
     <BookingLoading v-if="isLoading" />
+    <ClientOnly>
+      <DatePickerModal
+        ref="datePickerModal"
+        :date-time="edit_selectedDate"
+        :max-booking-people="bookingData.maxBookingPeople"
+        @handle-date-change="handleEditDate"
+      />
+    </ClientOnly>
   </main>
 </template>
 

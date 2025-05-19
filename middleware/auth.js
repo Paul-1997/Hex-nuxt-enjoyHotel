@@ -1,18 +1,18 @@
-export default defineNuxtRouteMiddleware(async (to, from) => {
-  const { checkLogin } = useUserStore()
+export default defineNuxtRouteMiddleware(async (from) => { 
+  const { checkLogin } = useUserStore();
+  const { isLogin } = storeToRefs(useUserStore());
+  const router = useRouter();
   try {
-    await checkLogin()
+    if (!isLogin.value) {
+      await checkLogin();
+    }
   } catch (error) {
-    // 重新登入
-    if (error.response?.status === 403) {
-      const { isConfirmed } = await errorAlert('登入失敗', error.response?._data?.message, {
-        showCancelButton: true,
-        cancelButtonText: '稍後再說',
-        confirmButtonText: '立即登入'
-      })
-      // 如果使用者選擇了確認，則導向登入頁面
-      if (isConfirmed) { navigateTo('/account/login') }
-    } 
-    else { errorAlert() }
+    // 確保重定向到登入頁面
+    if(error.response?.status){
+      return router.push({
+        query: {redirectURL: from.fullPath},
+        path: '/account/login'
+        });
+    }
   }
-})
+});
