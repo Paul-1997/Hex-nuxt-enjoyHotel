@@ -8,6 +8,19 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 
+// 設定頁面的 meta 資訊
+useHead({
+  title: '客房旅宿 | 享樂旅館 - 高雄頂級旅館',
+  meta: [
+    { name: 'description', content: '享樂旅館提供多種豪華客房選擇，從精緻雙人房到豪華套房，為您打造完美住宿體驗' },
+    { name: 'keywords', content: '享樂旅館,高雄住宿,豪華客房,雙人房,套房,訂房服務' },
+    { property: 'og:title', content: '客房旅宿 | 享樂旅館' },
+    { property: 'og:description', content: '探索我們的豪華客房，為您的高雄之旅提供最舒適的住宿選擇' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:image', content: '/images/home-banner.jpg' },
+  ]
+})
+
 const modules = ref([Autoplay, Navigation, Pagination])
 
 // get room list data

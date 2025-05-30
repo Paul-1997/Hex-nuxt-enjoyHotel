@@ -4,7 +4,6 @@ const useUserStore = defineStore('userStore', () => {
   const isLogin = ref(false)
   const userInfo = ref(null)
 
-  const { errorAlert } = useAlert()
   const { baseURL } = useRuntimeConfig().public
   const token = useCookie('HotelToken')
   const checkLogin = async () => {
@@ -66,25 +65,3 @@ const useUserStore = defineStore('userStore', () => {
 })
 
 export default useUserStore
-/*
-login
-signup
-forget
-check
-user(info) get, put
-
-verify
-generateCode
-
-get news(mult,single)
-get culinary(mult,single)
-get rooms(mult,single)
-
-order
-
-admin
- order
- culinary
- rooms\
- news
-*/

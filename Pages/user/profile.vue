@@ -106,55 +106,6 @@ const county = computed(() => {
 </script>
 
 <template>
-  <!-- <div id="signUpStep1" v-if="step < 2">
-        <div class="mb-4 fs-8 fs-md-7">
-
-        <div class="mb-4 fs-8 fs-md-7">
-          <label class="mb-2 text-neutral-0 fw-bold" for="password"> 密碼 </label>
-          <VeeField
-            v-slot="{ meta, field }"
-            type="password"
-            name="password"
-            label="密碼"
-            v-model="formData.password"
-            :keep-value="true"
-          >
-            <input
-              v-bind="field"
-              id="password"
-              type="password"
-              class="form-control p-4 text-neutral-100 fw-medium border-neutral-40"
-              :class="{ 'is-invalid': errors.password, 'is-valid': meta.valid && meta.dirty }"
-              placeholder="請輸入密碼"
-            />
-          </VeeField>
-          <VeeErrorMessage name="password" as="p" class="text-danger fw-bold mt-1 ps-2" />
-        </div>
-        <div class="mb-10 fs-8 fs-md-7">
-          <label class="mb-2 text-neutral-0 fw-bold" for="confirmPassword"> 確認密碼 </label>
-          <VeeField
-            v-slot="{ meta, field }"
-            type="password"
-            name="confirmPassword"
-            label="確認密碼"
-            v-model="formData.confirmPassword"
-            :keep-value="true"
-          >
-            <input
-              v-bind="field"
-              id="confirmPassword"
-              type="password"
-              class="form-control p-4 text-neutral-100 fw-medium border-neutral-40"
-              :class="{ 'is-invalid': errors.confirmPassword, 'is-valid': meta.valid && meta.dirty }"
-              placeholder="請再輸入一次密碼"
-            />
-          </VeeField>
-          <VeeErrorMessage name="confirmPassword" as="p" class="text-danger fw-bold mt-1 ps-2" />
-        </div>
-
-          </div>
-        </div>
-         -->
   <VeeForm
     ref="form"
     class="row gap-6 gap-md-0"

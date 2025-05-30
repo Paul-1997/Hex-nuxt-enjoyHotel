@@ -77,10 +77,10 @@ const getClass= (type) => {
   return props.classes[type] || defaultClass;
 }
 // emit 返回組件的值
-const emit = defineEmits(['update:address']);
+const emit = defineEmits(['update:zipcode', 'update:county', 'update:district'])
 watch(addressData, (newVal) => {
   console.log(newVal);
-  emit('update:address', addressData);
+  emit('update:zipcode', addressData);
 
 });
 watch(() => props.zip, (newVal)=>{

@@ -5,7 +5,6 @@ const { checkLogin, getUserInfo, userLogout } = useUserStore()
 const { isLogin, userInfo } = storeToRefs(useUserStore())
 // 掛載時驗證使用者是否登入
 onMounted(async () => {
-  const v = useCookie('HotelToken')
   await checkLogin()
   // 若先前已有資料則不在重複獲取
   if (isLogin) {

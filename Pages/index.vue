@@ -7,6 +7,19 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 
+// 設定頁面的 meta 資訊
+useHead({
+  title: '享樂旅館 | 高雄頂級旅館 - 提供奢華住宿體驗',
+  meta: [
+    { name: 'description', content: '享樂旅館 - 高雄頂級住宿首選，提供奢華客房、頂級設施與尊榮服務' },
+    { name: 'keywords', content: '享樂旅館,高雄住宿,豪華旅館,五星級飯店,高級住宿' },
+    { property: 'og:title', content: '享樂旅館 | 高雄頂級旅館' },
+    { property: 'og:description', content: '享受奢華住宿體驗，擁有精緻客房、完善設施及貼心服務' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:image', content: '/images/home-banner.jpg' },
+  ]
+})
+
 const modules = ref([Autoplay, Navigation, Pagination])
 
 const roomSwiper = ref(null)

@@ -15,48 +15,69 @@ const useBookingStore = defineStore("BookingStore", () => {
   const daysDiff = ref(0);
   
   const getBookingOrders = async () => {
-    const { result } = await $fetch('/orders', {
-      method: 'GET',
-      baseURL,
-      headers: {
-        Authorization: token.value ||''
-      }
-    })
-    console.log(result);
-    return result
+    try {
+      const { result } = await $fetch('/orders', {
+        method: 'GET',
+        baseURL,
+        headers: {
+          Authorization: token.value || ''
+        }
+      })
+      return result
+    } catch (error) {
+      console.error('取得訂單列表失敗:', error)
+      throw error
+    }
   };
+
   const getBookingOrderById = async (id) => {
-    const { result } = await $fetch(`/orders/${id}`, {
-      method: 'GET',
-      baseURL,
-      headers: {
-        Authorization: token.value ||''
-      }
-    })
-    console.log(result);
-    return result
+    try {
+      const { result } = await $fetch(`/orders/${id}`, {
+        method: 'GET', 
+        baseURL,
+        headers: {
+          Authorization: token.value || ''
+        }
+      })
+      return result
+    } catch (error) {
+      console.error('取得訂單詳情失敗:', error)
+      throw error
+    }
   };
+
   const updateBookingOrder = async (formData) => {
-    console.log(formData);
-    const { result } = await $fetch('/orders', {
-      method: 'POST',
-      baseURL,
-      headers: {
-        Authorization: token.value ||''
-      },
-      body: formData
-    })
-    return result;
+    try {
+      const { result } = await $fetch('/orders', {
+        method: 'POST',
+        baseURL,
+        headers: {
+          Authorization: token.value || ''
+        },
+        body: formData
+      })
+      return result
+    } catch (error) {
+      console.error('更新訂單失敗:', error)
+      throw error  
+    }
   };
+
   const deleteBookingOrder = async (id) => {
-    const { data } = await $fetch(`/orders/${id}`, {
-      method: 'DELETE',
-      baseURL,
-      headers: {
-        Authorization: token.value ||''
-      }
-    })
-    console.log('data',data);
+    try {
+      const result = await $fetch(`/orders/${id}`, {
+        method: 'DELETE',
+        baseURL,
+        headers: {
+          Authorization: token.value || ''
+        }
+      })
+      console.log(result,'delete');
+      return result
+    } catch (error) {
+      console.error('刪除訂單失敗:', error)
+      throw error
+    }
   };
   return {
     bookingData,

@@ -12,6 +12,33 @@ const { data } = await useAsyncData('room', () =>
 )
 const roomDetail = data.value?.result || {};
 
+// 設定動態的 meta 資訊
+useHead(() => ({
+  title: `${roomDetail.name || '房間資訊'} | 享樂旅館 - 高雄頂級旅館`,
+  meta: [
+    { 
+      name: 'description', 
+      content: roomDetail.description || '享樂旅館豪華客房，提供您舒適的住宿體驗'
+    },
+    { 
+      name: 'keywords', 
+      content: `享樂旅館,高雄住宿,${roomDetail.name},豪華客房`
+    },
+    { 
+      property: 'og:title', 
+      content: `${roomDetail.name || '房間資訊'} | 享樂旅館`
+    },
+    { 
+      property: 'og:description', 
+      content: roomDetail.description || '享樂旅館豪華客房，提供您舒適的住宿體驗'
+    },
+    { 
+      property: 'og:type', 
+      content: 'website'
+    },
+  ]
+}))
+
 // datepicker
 const datePickerModal = ref(null);
 const openModal = () => {
