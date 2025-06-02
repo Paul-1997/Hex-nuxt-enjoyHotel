@@ -2,7 +2,7 @@
 import { Icon } from '@iconify/vue'
 const { errorAlert } = useAlert()
 const { checkLogin, getUserInfo, userLogout } = useUserStore()
-const { isLogin, userInfo } = storeToRefs(useUserStore())
+const { isLogin, userInfo,isAdmin } = storeToRefs(useUserStore())
 // 掛載時驗證使用者是否登入
 onMounted(async () => {
   await checkLogin()
@@ -15,7 +15,6 @@ onMounted(async () => {
     }
   }
 })
-
 const route = useRoute()
 const transparentBgRoute = ['home', 'rooms']
 
@@ -26,6 +25,7 @@ const isScrolled = ref(false)
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 50
 }
+
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
@@ -110,11 +110,20 @@ onUnmounted(() => {
                   >
                     <li>
                       <NuxtLink
+                        v-if="!isAdmin"
                         to="/user/profile"
                         as="a"
                         class="dropdown-item px-6 py-4"
                       >
                         個人資料
+                      </NuxtLink>
+                      <NuxtLink
+                        v-else
+                        to="/admin"
+                        as="a"
+                        class="dropdown-item px-6 py-4"
+                      >
+                        管理頁面
                       </NuxtLink>
                     </li>
                     <li>

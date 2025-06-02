@@ -40,7 +40,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      baseURL: process.env.APP_BASEURL,
+      "baseURL": process.env.APP_BASEURL,
     }
   },
   modules: ['@pinia/nuxt', '@vee-validate/nuxt'],

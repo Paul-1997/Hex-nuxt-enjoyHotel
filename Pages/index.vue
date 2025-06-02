@@ -46,6 +46,7 @@ const newsData = data.value[0]?.value?.result.slice(0, 3) || []
 // 先指名第一個，後續再考慮是否採用隨機選取
 const roomIntro = data.value[1]?.value?.result[0] || {}
 const culinaryData = data.value[2]?.value?.result || []
+
 </script>
 <template>
   <main class="overflow-hidden">

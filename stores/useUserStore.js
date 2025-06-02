@@ -1,11 +1,14 @@
 import { defineStore } from 'pinia'
 
 const useUserStore = defineStore('userStore', () => {
-  const isLogin = ref(false)
-  const userInfo = ref(null)
+  const isLogin = ref(false);
+  const userInfo = ref(null);
+  const isAdmin = computed(() => userInfo.value?.role === 'admin');
 
   const { baseURL } = useRuntimeConfig().public
   const token = useCookie('HotelToken')
+
+
   const checkLogin = async () => {
     const res = await $fetch('user/check', {
       method: 'GET',
@@ -16,6 +19,8 @@ const useUserStore = defineStore('userStore', () => {
     })
     isLogin.value = res.status
   }
+
+
   const userLogin = async (account) => {
     const { token } = await $fetch('user/login', {
       method: 'POST',
@@ -27,11 +32,15 @@ const useUserStore = defineStore('userStore', () => {
     const cookie = useCookie('HotelToken', { expires: date })
     cookie.value = token
   }
+
+
   const userLogout = async () => {
-    token.value = undefined
-    isLogin.value = false
+    token.value = null;
+    isLogin.value = false;
     navigateTo('/')
   }
+
+
   const userSignUp = async (data) => {
     await $fetch('user/signup', {
       method: 'POST',
@@ -39,6 +48,8 @@ const useUserStore = defineStore('userStore', () => {
       body: data
     })
   }
+
+
   const getUserInfo = async () => {
     const { result } = await $fetch('user/', {
       method: 'GET',
@@ -61,7 +72,7 @@ const useUserStore = defineStore('userStore', () => {
     })
   }
 
-  return { isLogin, userInfo, userLogin, userLogout, userSignUp, checkLogin, getUserInfo, UpdateUserInfo }
+  return { isLogin,isAdmin, userInfo, userLogin, userLogout, userSignUp, checkLogin, getUserInfo, UpdateUserInfo }
 })
 
 export default useUserStore

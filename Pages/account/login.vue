@@ -4,24 +4,43 @@ definePageMeta({
 })
 const { errorAlert } = useAlert()
 // login
-const { userLogin } = useUserStore()
+const { userLogin } = useUserStore();
 const route = useRoute();
 const account = reactive({
   email: '',
   password: ''
 })
 const rememberAccount = ref(false)
+const isAdminMode = ref(false)
 
 const handleLogin = async () => {
   try {
-    await userLogin(account)
-    if (rememberAccount.value === true) { localStorage.setItem('HotelUserEmail', account.email) }
-    // 確認一下是否要重新導向
-    const path = route.query.redirectURL ? route.query.redirectURL : '/';
-    navigateTo(path);
+    await userLogin(account);
+    if (rememberAccount.value === true) { 
+        localStorage.setItem('HotelUserEmail', account.email) 
+      }
+
+    if (isAdminMode.value) {
+      navigateTo('/admin')
+    } else {
+      // 確認一下是否要重新導向
+      const getPath = ({redirectURL,isAdmin}) => { 
+        if (isAdmin) return '/admin'
+        return redirectURL ? redirectURL : '/'; 
+      }
+      navigateTo(getPath(route.query));
+    }
   } catch (error) {
-    errorAlert('登入失敗', error?.response?._data.message)
+    errorAlert('登入失敗', error?.response?._data?.message || '帳號或密碼不正確')
   }
+}
+
+const toggleLoginMode = () => {
+  isAdminMode.value = !isAdminMode.value
+  // 切換模式時清空表單
+  account.email = ''
+  account.password = ''
+  rememberAccount.value = false
 }
 
 // TODO: 之後補上
@@ -117,18 +136,27 @@ onMounted(() => {
         class="btn btn-primary-100 w-100 py-4 text-neutral-0 fw-bold"
         type="submit"
       >
-        會員登入
+        {{ isAdminMode ? '管理者登入' : '會員登入' }}
       </button>
     </VeeForm>
 
     <p class="mb-0 fs-8 fs-md-7">
-      <span class="me-2 text-neutral-0 fw-medium">沒有會員嗎？</span>
-      <NuxtLink
-        to="signup"
+      <span class="me-2 text-neutral-0 fw-medium">{{ isAdminMode ? '返回會員登入？' : '沒有會員嗎？' }}</span>
+      <template v-if="!isAdminMode">
+        <NuxtLink
+          to="signup"
+          class="text-primary-100 fw-bold text-decoration-underline bg-transparent border-0"
+        >
+          <span>前往註冊</span>
+        </NuxtLink>
+        <span class="mx-2 text-neutral-0">|</span>
+      </template>
+      <button
         class="text-primary-100 fw-bold text-decoration-underline bg-transparent border-0"
+        @click="toggleLoginMode"
       >
-        <span>前往註冊</span>
-      </NuxtLink>
+        {{ isAdminMode ? '會員登入' : '管理者登入' }}
+      </button>
     </p>
   </div>
 </template>

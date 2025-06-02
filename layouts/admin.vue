@@ -136,8 +136,9 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { Icon } from '@iconify/vue';
+const { userLogout } = useUserStore();
 const isSidebarCollapsed = ref(true)
 const isSmallScreen = ref(false)
 
@@ -149,9 +150,8 @@ const toggleSidebar = () => {
 }
 
 // 登出處理
-const handleLogout = () => {
-  // TODO: 實作登出邏輯
-  console.log('登出')
+const handleLogout = async () => {
+  await userLogout();
 }
 
 // 響應式處理
@@ -164,11 +164,11 @@ onMounted(() => {
   
   window.addEventListener('resize', handleResize)
   handleResize() // 初始檢查
-
-  onUnmounted(() => {
-    window.removeEventListener('resize', handleResize)
-  })
 })
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
+
 </script>
 
 <style scoped>
