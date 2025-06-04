@@ -27,7 +27,7 @@ export default defineNuxtConfig({
         { name: 'twitter:description', content: '高雄奢華住宿首選，提供尊榮服務與頂級設施' },
         // 針對不同裝置與瀏覽器的優化設定
         { name: 'format-detection', content: 'telephone=no' },
-        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
         { name: 'apple-mobile-web-app-title', content: '享樂旅館' },
         { name: 'theme-color', content: '#BF9D7D' },

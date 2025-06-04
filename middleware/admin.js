@@ -13,7 +13,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
       }
     })
   try{
-    console.log(123456)
     // no login
     if (!isLogin.value){
       await checkLogin();
