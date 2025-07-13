@@ -3,7 +3,6 @@
     <h2 class="mb-4">
       產品管理
     </h2>
-
     <!-- 標籤頁導航 -->
     <ul class="nav nav-tabs mb-4">
       <li class="nav-item">
@@ -50,30 +49,21 @@
             <tr>
               <th>房型名稱</th>
               <th>價格</th>
-              <th>房間數量</th>
-              <th>狀態</th>
+              <th>坪數</th>
+              <th>最大人數</th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody>
-            <template v-if="!loading && rooms.length">
+            <template v-if="!onFetchDataLoading && roomList?.length">
               <tr
-                v-for="room in rooms"
+                v-for="room in roomList"
                 :key="room._id"
               >
                 <td>{{ room.name }}</td>
                 <td>{{ room.price }}</td>
-                <td>{{ room.amount }}</td>
-                <td>
-                  <div class="form-check form-switch">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      :checked="room.status"
-                      @change="handleStatusToggle(room, 'rooms')"
-                    >
-                  </div>
-                </td>
+                <td>{{ room.areaInfo }}</td>
+                <td>{{ room.maxPeople }}</td>
                 <td>
                   <div class="btn-group">
                     <NuxtLink
@@ -84,7 +74,7 @@
                     </NuxtLink>
                     <button
                       class="btn btn-sm btn-outline-danger"
-                      @click="handleDelete(room._id, 'rooms')"
+                      @click="handleDelete(room.name, room._id, 'rooms')"
                     >
                       刪除
                     </button>
@@ -92,7 +82,7 @@
                 </td>
               </tr>
             </template>
-            <tr v-else-if="loading">
+            <tr v-else-if="onFetchDataLoading">
               <td
                 colspan="5"
                 class="text-center"
@@ -112,6 +102,9 @@
               >
                 暫無房型資料
               </td>
+              <td colspan="5">
+                {{ rooms }}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -127,13 +120,13 @@
         <h4 class="mb-0">
           佳餚列表
         </h4>
-        <NuxtLink 
-          to="/admin/culinary/new"
+        <button 
           class="btn btn-primary"
+          @click="openModal(type)"
         >
           <i class="bi bi-plus-lg me-2" />
           新增佳餚
-        </NuxtLink>
+        </button>
       </div>
 
       <div class="table-responsive">
@@ -148,9 +141,9 @@
             </tr>
           </thead>
           <tbody>
-            <template v-if="!loading && culinary.length">
+            <template v-if="!onFetchDataLoading && culinaryList?.length">
               <tr
-                v-for="item in culinary"
+                v-for="item in culinaryList"
                 :key="item._id"
               >
                 <td>{{ item.title }}</td>
@@ -176,7 +169,7 @@
                     </NuxtLink>
                     <button
                       class="btn btn-sm btn-outline-danger"
-                      @click="handleDelete(item._id, 'culinary')"
+                      @click="handleDelete(item.title, item._id, 'culinary')"
                     >
                       刪除
                     </button>
@@ -184,7 +177,7 @@
                 </td>
               </tr>
             </template>
-            <tr v-else-if="loading">
+            <tr v-else-if="onFetchDataLoading">
               <td
                 colspan="5"
                 class="text-center"
@@ -217,62 +210,26 @@ definePageMeta({
   layout: 'admin'
 })
 
-const activeTab = ref('rooms')
-const loading = ref(false)
-const rooms = ref([])
-const culinary = ref([])
-
-// 取得房型資料
-const fetchRooms = async () => {
-  try {
-    loading.value = true
-    const { data } = await useFetch('admin/rooms', {
-      method: 'GET',
+const auth = {
       baseURL: useRuntimeConfig().public.baseURL,
       headers: {
         Authorization: useCookie('HotelToken').value || ''
       }
-    })
-    rooms.value = data.value?.result || []
-  } catch (error) {
-    console.error('獲取房型資料失敗：', error)
-  } finally {
-    loading.value = false
-  }
-}
-
+    }
 // 取得佳餚資料
-const fetchCulinary = async () => {
-  try {
-    loading.value = true
-    const { data } = await useFetch('admin/culinary', {
-      method: 'GET',
-      baseURL: useRuntimeConfig().public.baseURL,
-      headers: {
-        Authorization: useCookie('HotelToken').value || ''
-      }
-    })
-    culinary.value = data.value?.result || []
-  } catch (error) {
-    console.error('獲取佳餚資料失敗：', error)
-  } finally {
-    loading.value = false
-  }
-}
+const { data:culinary,status:getCulinaryStatus, refresh:getCulinary } = await useFetch('admin/culinary',{method:'get',...auth})
+const culinaryList = computed(()=> culinary.value?.result ?? []);
+// 取得房型資料
+const { data:rooms,status:getRoomStatus, refresh:getRoom } = await useFetch('admin/rooms',{method:'get',...auth})
+const roomList = computed(()=> rooms.value?.result ?? []);
+
+// 狀態管理
+const activeTab = ref('rooms')
+const onFetchDataLoading = computed(()=> getCulinaryStatus.value === 'pending' || getRoomStatus.value === 'pending');
+const onHandleProgress = ref(false);
 
 // 監聽標籤頁切換
-watch(activeTab, (newTab) => {
-  if (newTab === 'rooms') {
-    fetchRooms()
-  } else {
-    fetchCulinary()
-  }
-})
-
-// 初始化資料
-onMounted(() => {
-  fetchRooms()
-})
+watch(activeTab,async (newTab) => newTab === 'rooms' ? await getRoom() : await getCulinary())
 
 // 處理狀態切換
 const handleStatusToggle = async (item, type) => {
@@ -301,29 +258,24 @@ const handleStatusToggle = async (item, type) => {
   }
 }
 
+const openUpdateModal = (type,isNew) => {
+
+}
 // 刪除項目
-const handleDelete = async (id, type) => {
-  if (!confirm('確定要刪除此項目嗎？')) return
-  
-  try {
-    const endpoint = type === 'rooms' ? 'admin/rooms' : 'admin/culinary'
-    const { data } = await useFetch(`${endpoint}/${id}`, {
-      method: 'DELETE',
-      baseURL: useRuntimeConfig().public.baseURL,
-      headers: {
-        Authorization: useCookie('HotelToken').value || ''
-      }
-    })
-    
-    if (data.value?.success) {
-      if (type === 'rooms') {
-        await fetchRooms()
-      } else {
-        await fetchCulinary()
-      }
+const { showDeleteModal } = useAlert()
+const handleDelete = async (title, id, type) => {
+  const isConfirmed = await showDeleteModal(title)
+  if (isConfirmed) {
+    try {
+      // onHandleProgress.value = true;
+      await $fetch(`admin/${type}/${id}`, { method: 'DELETE', ...auth })
+      // refresh data
+      type === 'rooms' ? await getRoom() : await getCulinary()
+    } catch (error) {
+      console.error('刪除失敗：', error)
+    } finally {
+      // onHandleProgress.value = false;
     }
-  } catch (error) {
-    console.error('刪除失敗：', error)
   }
 }
 </script>

@@ -3,10 +3,11 @@
 definePageMeta({ layout: false })
 
 // 否則會回傳200 成功
+const router = useRouter();
 const event = useRequestEvent()
 setResponseStatus(event, 404)
 
-const backToHome = () => navigateTo('/')
+const backToHome = () => router.push('/');
 
 </script>
 <template>

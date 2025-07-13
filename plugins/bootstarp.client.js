@@ -8,7 +8,7 @@ export default defineNuxtPlugin(() => {
       bootstrap: {
         Collapse,
         Modal,
-        Dropdown
+        Dropdown,
       }
     }
   }
