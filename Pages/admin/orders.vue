@@ -463,9 +463,9 @@
       modal-name="deleteOrderModal"
     >
       <template #title>
-        <h5 class="modal-title">
+        <h3 class="modal-header">
           刪除訂單
-        </h5>
+        </h3>
       </template>
       <template #body>
         <p>確定要刪除這個訂單嗎？此操作無法撤銷。</p>

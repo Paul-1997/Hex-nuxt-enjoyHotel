@@ -3,7 +3,5 @@ import 'vue-loading-overlay/dist/css/index.css'
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(LoadingPlugin);
-  nuxtApp.provide('loading',useLoading({
-    isFullPage: false
-  }));
+  nuxtApp.provide('loading',useLoading());
 }) 
