@@ -143,17 +143,17 @@
       <template #title>
         <div class="modal-header">
           <h5 class="modal-title fw-bold">
-            {{ isEditing ? '編輯消息' : '新增消息' }}
-          </h5>
-          <button 
-            type="button" 
-            class="btn-close" 
-            aria-label="Close"
+          {{ isEditing ? '編輯消息' : '新增消息' }}
+        </h5>
+        <button 
+          type="button" 
+          class="btn-close" 
+          aria-label="Close"
             @click="handleCloseNewsModal"
-          />
-        </div>
+        />
+      </div>
       </template>
-
+      
       <template #body>
         <form @submit.prevent="handleSubmit">
           <div class="mb-3">
@@ -214,7 +214,7 @@
           </div>
         </form>
       </template>
-
+      
       <template #footer>
         <button
           type="button"
@@ -239,21 +239,21 @@
       :modal-name="'delete-confirm-modal'"
     >
       <template #title>
-        <div class="modal-header">
-          <h5 class="modal-title">
-            刪除消息
-          </h5>
-          <button 
-            type="button" 
-            class="btn-close" 
-            aria-label="Close"
+      <div class="modal-header">
+        <h5 class="modal-title">
+          刪除消息
+        </h5>
+        <button 
+          type="button" 
+          class="btn-close" 
+          aria-label="Close"
             @click="handleCloseDeleteModal"
-          />
-        </div>
+        />
+      </div>
       </template>
-
+      
       <template #body>
-        <div class="modal-body">
+      <div class="modal-body">
           <p>確定要刪除以下消息嗎？此操作無法撤銷。</p>
           <div
             v-if="tempNews"
@@ -268,9 +268,9 @@
               </p>
             </div>
           </div>
-        </div>
+      </div>
       </template>
-
+      
       <template #footer>
         <button
           type="button"
@@ -418,7 +418,7 @@ const { data, refresh } = await useFetch('admin/news', {
 // 更新列表數據
 const updateNewsList = async () => {
   await refresh();
-  newsList.value = data.value?.result || [];
+newsList.value = data.value?.result || [];
 };
 
 // 初始化數據
@@ -530,7 +530,7 @@ const formatDateTime = (date) => {
   const d = new Date(date);
   return `${d.toLocaleDateString('zh-TW')} ${d.toLocaleTimeString('zh-TW')}`;
 };
-</script>
+</script> 
 
 <style scoped>
 @media (max-width: 767px) {
