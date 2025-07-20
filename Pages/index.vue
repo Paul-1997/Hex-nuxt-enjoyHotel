@@ -32,11 +32,13 @@ const slideNext = () => {
 }
 
 // get all needed data
+const { fetchApi } = useApiClient()
+
 const { data } = await useAsyncData('homeData', async () => {
   const callAPi = [
-    $fetch('https://freyja-01v8.onrender.com/api/v1/home/news'),
-    $fetch('https://freyja-01v8.onrender.com/api/v1/rooms/'),
-    $fetch('https://freyja-01v8.onrender.com/api/v1/home/culinary')
+    fetchApi('home/news'),
+    fetchApi('rooms/'),
+    fetchApi('home/culinary')
   ]
   const data = await Promise.allSettled(callAPi)
   return data

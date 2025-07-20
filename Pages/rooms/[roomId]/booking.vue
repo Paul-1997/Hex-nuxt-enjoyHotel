@@ -86,9 +86,11 @@ const handleAddressUpdate = (data) => {
   formData.address.county = data.county;
   zipCode.value = "";
 };
+
+const { fetchApi } = useApiClient()
 const { data, refresh } = await useAsyncData('room', () => {
   const roomId = route.params.roomId;
-  return $fetch(`https://freyja-01v8.onrender.com/api/v1/rooms/${roomId}`);
+  return fetchApi(`rooms/${roomId}`);
 });
 const roomDetail = ref({});
 roomDetail.value = data.value.result;
@@ -145,7 +147,7 @@ const edit_selectedDate = reactive({
 // ROOM
 watchEffect(async ()=> {
   if(isBookingRoomEdit.value && !roomArr.length){
-    const { result } = await $fetch(`https://freyja-01v8.onrender.com/api/v1/rooms/`);
+    const { result } = await fetchApi(`rooms/`);
     roomArr.value = result.map(room => {
       const {name , _id } = room;
       return { name, _id };

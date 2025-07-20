@@ -143,15 +143,15 @@
       <template #title>
         <div class="modal-header">
           <h5 class="modal-title fw-bold">
-          {{ isEditing ? '編輯消息' : '新增消息' }}
-        </h5>
-        <button 
-          type="button" 
-          class="btn-close" 
-          aria-label="Close"
+            {{ isEditing ? '編輯消息' : '新增消息' }}
+          </h5>
+          <button 
+            type="button" 
+            class="btn-close" 
+            aria-label="Close"
             @click="handleCloseNewsModal"
-        />
-      </div>
+          />
+        </div>
       </template>
       
       <template #body>
@@ -239,21 +239,21 @@
       :modal-name="'delete-confirm-modal'"
     >
       <template #title>
-      <div class="modal-header">
-        <h5 class="modal-title">
-          刪除消息
-        </h5>
-        <button 
-          type="button" 
-          class="btn-close" 
-          aria-label="Close"
+        <div class="modal-header">
+          <h5 class="modal-title">
+            刪除消息
+          </h5>
+          <button 
+            type="button" 
+            class="btn-close" 
+            aria-label="Close"
             @click="handleCloseDeleteModal"
-        />
-      </div>
+          />
+        </div>
       </template>
       
       <template #body>
-      <div class="modal-body">
+        <div class="modal-body">
           <p>確定要刪除以下消息嗎？此操作無法撤銷。</p>
           <div
             v-if="tempNews"
@@ -268,7 +268,7 @@
               </p>
             </div>
           </div>
-      </div>
+        </div>
       </template>
       
       <template #footer>
@@ -407,12 +407,11 @@ const handleReset = () => {
  * API 操作
  */
 const { showToast } = useAlert();
-const { data, refresh } = await useFetch('admin/news', {
-  method: 'GET',
-  baseURL: useRuntimeConfig().public.baseURL,
-  headers: {
-    Authorization: useCookie('HotelToken').value || ''
-  }
+const { fetchApiWithToken, getAuthConfig } = useApiClient();
+
+const { data, refresh } = await useFetch('admin/news', { 
+  method: 'GET', 
+  ...getAuthConfig()
 });
 
 // 更新列表數據
@@ -429,12 +428,8 @@ onMounted(async () => {
 // 新增消息
 const addNews = async (newsData) => {
   try {
-    const { status } = await $fetch('admin/news', {
+    const { status } = await fetchApiWithToken('admin/news', {
       method: 'POST',
-      baseURL: useRuntimeConfig().public.baseURL,
-      headers: {
-        Authorization: useCookie('HotelToken').value || ''
-      },
       body: newsData
     });
     if (status) {
@@ -450,12 +445,8 @@ const addNews = async (newsData) => {
 // 更新消息
 const updateNews = async (id, newsData) => {
   try {
-    const { status } = await $fetch(`admin/news/${id}`, {
+    const { status } = await fetchApiWithToken(`admin/news/${id}`, {
       method: 'PUT',
-      baseURL: useRuntimeConfig().public.baseURL,
-      headers: {
-        Authorization: useCookie('HotelToken').value || ''
-      },
       body: newsData
     });
     
@@ -477,12 +468,8 @@ const handleConfirmDelete = async () => {
     isLoading.value = true;
     const id = selectedNewsId.value;
     handleCloseDeleteModal();
-    const { status } = await $fetch(`admin/news/${id}`, {
-      method: 'DELETE',
-      baseURL: useRuntimeConfig().public.baseURL,
-      headers: {
-        Authorization: useCookie('HotelToken').value || ''
-      }
+    const { status } = await fetchApiWithToken(`admin/news/${id}`, {
+      method: 'DELETE'
     });
     if (status) {
       showToast('刪除消息成功', 'success');

@@ -24,7 +24,8 @@ useHead({
 const modules = ref([Autoplay, Navigation, Pagination])
 
 // get room list data
-const { data } = await useAsyncData('rooms', () => $fetch('https://freyja-01v8.onrender.com/api/v1/rooms/'))
+const { fetchApi } = useApiClient()
+const { data } = await useAsyncData('rooms', () => fetchApi('rooms/'))
 const roomList = data.value?.result || []
 
 // console.log(roomList[0])

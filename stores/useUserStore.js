@@ -5,34 +5,25 @@ const useUserStore = defineStore('userStore', () => {
   const userInfo = ref(null);
   const isAdmin = computed(() => userInfo.value?.role === 'admin');
 
-  const { baseURL } = useRuntimeConfig().public
-  const token = useCookie('HotelToken')
-
+  const { fetchApi, fetchApiWithToken } = useApiClient()
 
   const checkLogin = async () => {
-    const res = await $fetch('user/check', {
-      method: 'GET',
-      baseURL,
-      headers: {
-        Authorization: token.value ||''
-      }
+    const res = await fetchApiWithToken('user/check', {
+      method: 'GET'
     })
     isLogin.value = res.status
   }
 
-
   const userLogin = async (account) => {
-    const { token } = await $fetch('user/login', {
+    const { token: authToken } = await fetchApi('user/login', {
       method: 'POST',
-      baseURL,
       body: account
     })
     const date = new Date()
     date.setDate(date.getDate() + 7)
     const cookie = useCookie('HotelToken', { expires: date })
-    cookie.value = token
+    cookie.value = authToken
   }
-
 
   const userLogout = async () => {
     token.value = null;
@@ -40,39 +31,28 @@ const useUserStore = defineStore('userStore', () => {
     navigateTo('/')
   }
 
-
   const userSignUp = async (data) => {
-    await $fetch('user/signup', {
+    await fetchApi('user/signup', {
       method: 'POST',
-      baseURL,
       body: data
     })
   }
 
-
   const getUserInfo = async () => {
-    const { result } = await $fetch('user/', {
-      method: 'GET',
-      baseURL,
-      headers: {
-        Authorization: token.value || ''
-      }
+    const { result } = await fetchApiWithToken('user/', {
+      method: 'GET'
     })
     userInfo.value = result
   }
 
   const UpdateUserInfo = async (data) => {
-    return await $fetch('user/', {
+    return await fetchApiWithToken('user/', {
       method: 'PUT',
-      baseURL,
-      headers: {
-        Authorization: token.value || ''
-      },
       body: data
     })
   }
 
-  return { isLogin,isAdmin, userInfo, userLogin, userLogout, userSignUp, checkLogin, getUserInfo, UpdateUserInfo }
+  return { isLogin, isAdmin, userInfo, userLogin, userLogout, userSignUp, checkLogin, getUserInfo, UpdateUserInfo }
 })
 
 export default useUserStore

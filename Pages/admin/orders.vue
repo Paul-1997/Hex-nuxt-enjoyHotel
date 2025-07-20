@@ -496,6 +496,9 @@ definePageMeta({
   layout: 'admin'
 })
 
+// API 設定
+const { fetchApiWithToken, getAuthConfig } = useApiClient()
+
 // 用戶狀態反饋
 const isLoading = computed(() => status.value === 'pending')
 const { showToast } = useAlert()
@@ -517,7 +520,6 @@ const roomOptions = ref([])
 const selectedRoom = computed(() => {
   return roomOptions.value.find(room => room._id === tempOrder.value.roomId._id)
 })
-
 
 // 重置搜尋
 const handleResetSearch = () => {
@@ -574,14 +576,8 @@ const handleToggleModal = async (modal, orderId) => {
 // 取得房型選項
 const fetchRoomOptions = async () => {
   try {
-    const { data } = await useFetch('admin/rooms', {
-      method: 'GET',
-      baseURL: useRuntimeConfig().public.baseURL,
-      headers: {
-        Authorization: useCookie('HotelToken').value || ''
-      }
-    })
-    roomOptions.value = data.value?.result || []
+    const response = await fetchApiWithToken('admin/rooms', { method: 'GET' })
+    roomOptions.value = response?.result || []
   } catch (error) {
     console.error('取得房型資料失敗：', error)
     showToast('取得房型資料失敗', 'error')
@@ -640,12 +636,8 @@ const formatAddress = (address) => {
 const handleDeleteOrder = async (orderId) => {
   try {
     handleToggleModal(deleteOrderModal.value)
-    await $fetch(`admin/orders/${orderId}`, {
-      method: 'DELETE',
-      baseURL: useRuntimeConfig().public.baseURL,
-      headers: {
-        Authorization: useCookie('HotelToken').value || ''
-      }
+    await fetchApiWithToken(`admin/orders/${orderId}`, {
+      method: 'DELETE'
     })
     showToast('刪除訂單成功', 'success')
   } catch (error) {
@@ -687,13 +679,9 @@ const handleEditOrder = async () => {
   try {
     const id = selectedOrderId.value;
     handleToggleModal(editOrderModal.value)
-    await $fetch(`admin/orders/${id}`, {
+    await fetchApiWithToken(`admin/orders/${id}`, {
       method: 'PUT',
-      baseURL: useRuntimeConfig().public.baseURL,
-      body: tempOrder.value,
-      headers: {
-        Authorization: useCookie('HotelToken').value || ''
-      }
+      body: tempOrder.value
     })
     showToast('編輯訂單成功', 'success')
   } catch (error) {
@@ -708,10 +696,7 @@ const handleEditOrder = async () => {
 // API 呼叫
 const { data, status, refresh } = await useFetch('admin/orders/', {
   method: 'GET',
-  baseURL: useRuntimeConfig().public.baseURL,
-  headers: {
-    Authorization: useCookie('HotelToken').value || ''
-  }
+  ...getAuthConfig()
 })
 const orders = computed(() => data.value?.result || [])
 

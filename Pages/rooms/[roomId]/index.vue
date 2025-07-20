@@ -7,8 +7,9 @@ const route = useRoute()
 const bookingStore = useBookingStore();
 const { bookingData, daysDiff } = storeToRefs(bookingStore);
 // get room data
+const { fetchApi } = useApiClient()
 const { data } = await useAsyncData('room', () =>
-  $fetch(`https://freyja-01v8.onrender.com/api/v1/rooms/${route.params.roomId}`)
+  fetchApi(`rooms/${route.params.roomId}`)
 )
 const roomDetail = data.value?.result || {};
 

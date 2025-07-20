@@ -2,8 +2,7 @@ import { defineStore } from "pinia";
 
 const useBookingStore = defineStore("BookingStore", () => {
 
-  const { baseURL } = useRuntimeConfig().public;
-  const token = useCookie('HotelToken');
+  const { fetchApiWithToken } = useApiClient()
   const bookingData = ref({
     // 預訂房間
     roomId: '',
@@ -16,12 +15,8 @@ const useBookingStore = defineStore("BookingStore", () => {
   
   const getBookingOrders = async () => {
     try {
-      const { result } = await $fetch('/orders', {
-        method: 'GET',
-        baseURL,
-        headers: {
-          Authorization: token.value || ''
-        }
+      const { result } = await fetchApiWithToken('/orders', {
+        method: 'GET'
       })
       return result
     } catch (error) {
@@ -32,12 +27,8 @@ const useBookingStore = defineStore("BookingStore", () => {
 
   const getBookingOrderById = async (id) => {
     try {
-      const { result } = await $fetch(`/orders/${id}`, {
-        method: 'GET', 
-        baseURL,
-        headers: {
-          Authorization: token.value || ''
-        }
+      const { result } = await fetchApiWithToken(`/orders/${id}`, {
+        method: 'GET'
       })
       return result
     } catch (error) {
@@ -48,12 +39,8 @@ const useBookingStore = defineStore("BookingStore", () => {
 
   const updateBookingOrder = async (formData) => {
     try {
-      const { result } = await $fetch('/orders', {
+      const { result } = await fetchApiWithToken('/orders', {
         method: 'POST',
-        baseURL,
-        headers: {
-          Authorization: token.value || ''
-        },
         body: formData
       })
       return result
@@ -65,12 +52,8 @@ const useBookingStore = defineStore("BookingStore", () => {
 
   const deleteBookingOrder = async (id) => {
     try {
-      const result = await $fetch(`/orders/${id}`, {
-        method: 'DELETE',
-        baseURL,
-        headers: {
-          Authorization: token.value || ''
-        }
+      const result = await fetchApiWithToken(`/orders/${id}`, {
+        method: 'DELETE'
       })
       console.log(result,'delete');
       return result
@@ -88,6 +71,5 @@ const useBookingStore = defineStore("BookingStore", () => {
     deleteBookingOrder,
   }
 })
-
 
 export default useBookingStore;

@@ -8,7 +8,6 @@ definePageMeta({
 // plugin
 const { showAlert, errorAlert } = useAlert()
 const { userSignUp } = useUserStore()
-const { BaseURL } = useRuntimeConfig().public
 // form instance
 const form = ref(null)
 const formData = reactive({
@@ -104,12 +103,12 @@ const onSubmitForm = async () => {
   }
 }
 // check email is verified or not when input
+const { fetchApi } = useApiClient()
 const checkEmailVerification = debounce(async () => {
   try {
     isVerifyingEmail.value = true
     isEmailAvailable.value = false
-    const response = await $fetch('verify/email', {
-      BaseURL,
+    const response = await fetchApi('verify/email', {
       method: 'POST',
       body: { email: formData.email }
     })

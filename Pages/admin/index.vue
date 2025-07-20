@@ -257,12 +257,7 @@ definePageMeta({
 })
 
 // API 設定
-const auth = {
-  baseURL: useRuntimeConfig().public.baseURL,
-  headers: {
-    Authorization: useCookie('HotelToken').value || ''
-  }
-}
+const { fetchApiWithToken } = useApiClient()
 
 // 載入狀態
 const isLoading = ref(true)
@@ -353,10 +348,10 @@ const fetchDashboardStats = async () => {
   try {
     // 並行獲取所有統計資料
     const results = await Promise.allSettled([
-      $fetch('admin/orders', { ...auth }),
-      $fetch('admin/rooms', { method: 'get', ...auth }),
-      $fetch('admin/culinary', { method: 'get', ...auth }),
-      $fetch('admin/news', { method: 'get', ...auth })
+      fetchApiWithToken('admin/orders'),
+      fetchApiWithToken('admin/rooms', { method: 'get' }),
+      fetchApiWithToken('admin/culinary', { method: 'get' }),
+      fetchApiWithToken('admin/news', { method: 'get' })
     ])
 
     const [ordersData, roomsData, culinaryData, newsData] = results.map(result => 

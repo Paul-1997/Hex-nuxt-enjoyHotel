@@ -833,12 +833,7 @@ definePageMeta({
 })
 
 // API 設定
-const auth = {
-      baseURL: useRuntimeConfig().public.baseURL,
-      headers: {
-        Authorization: useCookie('HotelToken').value || ''
-      }
-    }
+const { fetchApiWithToken, getAuthConfig } = useApiClient()
 
 // Loading 狀態控制
 const isLoading = ref(false)
@@ -913,10 +908,16 @@ const activeTab = ref('rooms')
 const { showToast } = useAlert()
 
 // API 資料獲取
-const { data: culinary, refresh: getCulinary } = await useFetch('admin/culinary', { method: 'get', ...auth })
+const { data: culinary, refresh: getCulinary } = await useFetch('admin/culinary', { 
+  method: 'get',
+  ...getAuthConfig()
+})
 const culinaryList = computed(() => culinary.value?.result ?? [])
 
-const { data: rooms, refresh: getRoom } = await useFetch('admin/rooms', { method: 'get', ...auth })
+const { data: rooms, refresh: getRoom } = await useFetch('admin/rooms', { 
+  method: 'get',
+  ...getAuthConfig()
+})
 const roomList = computed(() => rooms.value?.result ?? [])
 
 // Modal 相關狀態
@@ -1066,7 +1067,7 @@ const handleConfirmDelete = async () => {
     const type = currentItem.value.type;
     isLoading.value = true;
     handleCloseDeleteModal()
-    await $fetch(`admin/${type}/${id}`, { method: 'DELETE', ...auth })
+    await fetchApiWithToken(`admin/${type}/${id}`, { method: 'DELETE' })
     //refresh data
     type === 'rooms' ? 
       await getRoom() 
@@ -1110,10 +1111,9 @@ const handleSubmitCulinary = async () => {
       const method = isEdit.value ? 'PUT' : 'POST';
       handleCloseCulinaryModal()
       // 發送資料
-      const res =await $fetch(path, {
+      const res = await fetchApiWithToken(path, {
         method: method,
-        body: submitData,
-        ...auth
+        body: submitData
       })
       console.log(res);
       showToast(
@@ -1165,10 +1165,9 @@ const handleSubmitRoom = async () => {
     const method = isEdit.value ? 'PUT' : 'POST';
     handleCloseRoomModal()
     // 發送資料
-    const res = await $fetch(path, {
+    const res = await fetchApiWithToken(path, {
       method: method,
-      body: submitData,
-      ...auth
+      body: submitData
     })
     console.log(res);
     showToast(
