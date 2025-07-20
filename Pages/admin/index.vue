@@ -138,7 +138,10 @@
                     </div>
                   </td>
                   <td>
-                    <span class="fw-medium text-success">{{ order.displayPrice }}</span>
+                    <span
+                      v-currency="order.displayPrice"
+                      class="fw-medium text-success"
+                    />
                   </td>
                   <td>
                     <span
@@ -216,9 +219,10 @@
                 </div>
                 <div class="col-4 text-end">
                   <small class="text-muted">金額</small>
-                  <div class="fw-medium text-success">
-                    {{ order.displayPrice }}
-                  </div>
+                  <div
+                    v-currency="order.displayPrice"
+                    class="fw-medium text-success"
+                  />
                 </div>
               </div>
             </div>
@@ -249,7 +253,8 @@
 
 <script setup>
 import { Icon } from '@iconify/vue'
-import { formatDate } from '~/utils/formatDate'
+import { calculateDaysDiff, calculateBasicPrice } from '~/utils/booking'
+import { formatDateShort } from '~/utils/formatDate'
 
 definePageMeta({
   layout: 'admin',
@@ -274,42 +279,16 @@ const dashboardStats = ref({
 // 最近訂單資料
 const recentOrders = ref([])
 
-/**
- * 計算住宿天數
- */
-const calculateNights = (checkIn, checkOut) => {
-  if (!checkIn || !checkOut) return 0
+
+const getOrderPrice = (order) => {
+  if (!order?.roomId?.price) return 0
   
-  const start = new Date(checkIn)
-  const end = new Date(checkOut)
-  const diffTime = Math.abs(end - start)
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return diffDays
+  return calculateBasicPrice(order.roomId.price, order.checkInDate, order.checkOutDate)
 }
 
-/**
- * 獲取訂單顯示價格（根據房間價格計算）
- */
-const getOrderDisplayPrice = (order) => {
-  // 檢查是否有房間價格資訊
-  if (order?.roomId?.price && !isNaN(order.roomId.price)) {
-    const nights = calculateNights(order.checkInDate, order.checkOutDate)
-    if (nights > 0) {
-      const price = Number(order.roomId.price) * nights
-      return `NT$ ${price.toLocaleString('zh-TW')}`
-    }
-  }
-  
-  // 如果沒有足夠資訊計算價格
-  return 'NT$ 0'
-}
-
-/**
- * 計算並緩存訂單相關資訊（避免重複計算）
- */
 const processOrderData = (order) => {
-  const nights = calculateNights(order.checkInDate, order.checkOutDate)
-  const displayPrice = getOrderDisplayPrice(order)
+  const nights = calculateDaysDiff(order.checkInDate, order.checkOutDate)
+  const displayPrice = getOrderPrice(order)
   
   return {
     ...order,
@@ -334,7 +313,7 @@ const formatOrderDate = (date) => {
   if (!date) return '-'
   
   try {
-    return formatDate(date, 'MM/DD')
+    return formatDateShort(date)
   } catch (error) {
     console.warn('日期格式化失敗：', error)
     return '-'

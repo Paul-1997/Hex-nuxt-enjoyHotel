@@ -391,10 +391,10 @@
                 class="d-flex justify-content-between"
               >
                 <p class="text-muted small mb-0">
-                  建立時間：{{ formatDate(tempCulinary.createdAt, 'YYYY/MM/DD HH:mm') }}
+                  建立時間：<span v-format-date.datetime="tempCulinary.createdAt" />
                 </p>
                 <p class="text-muted small mb-0">
-                  更新時間：{{ formatDate(tempCulinary.updatedAt, 'YYYY/MM/DD HH:mm') }}
+                  更新時間：<span v-format-date.datetime="tempCulinary.updatedAt" />
                 </p>
               </div>
             </div>
@@ -793,10 +793,10 @@
             class="d-flex justify-content-between"
           >
             <p class="text-muted small mb-0">
-              建立時間：{{ formatDate(tempRoom.createdAt, 'YYYY/MM/DD HH:mm') }}
+              建立時間：<span v-format-date.datetime="tempRoom.createdAt" />
             </p>
             <p class="text-muted small mb-0">
-              更新時間：{{ formatDate(tempRoom.updatedAt, 'YYYY/MM/DD HH:mm') }}
+              更新時間：<span v-format-date.datetime="tempRoom.updatedAt" />
             </p>
           </div>
         </div>
@@ -825,7 +825,6 @@
 
 <script setup>
 import { Icon } from '@iconify/vue'
-import { formatDate } from '~/utils/formatDate'
 
 // Page Meta
 definePageMeta({

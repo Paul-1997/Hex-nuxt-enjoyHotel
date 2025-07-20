@@ -94,14 +94,7 @@ const { data, refresh } = await useAsyncData('room', () => {
 });
 const roomDetail = ref({});
 roomDetail.value = data.value.result;
-const formatDate = (v) => {
-  const date = new Date(v);
-  const MONTH = date.getMonth() + 1;
-  const DAY = date.getDate();
-  const WEEK = ['日', '一', '二', '三', '四', '五', '六'][date.getDay()];
 
-  return `${MONTH} 月 ${DAY} 日星期 ${WEEK}`;
-};
 const clipUserData = async () => {
   const isLogin = await checkUserLogin();
   if (isLogin) {
@@ -269,10 +262,10 @@ onMounted(async () => {
                       訂房日期
                     </h3>
                     <p class="mb-2 fw-medium">
-                      入住：{{ formatDate(bookingData.checkInDate) }}
+                      入住：<span v-format-date="bookingData.checkInDate" />
                     </p>
                     <p class="mb-0 fw-medium">
-                      退房：{{ formatDate(bookingData.checkOutDate) }}
+                      退房：<span v-format-date="bookingData.checkOutDate" />
                     </p>
                   </div>
                   <button

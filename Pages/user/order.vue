@@ -1,44 +1,12 @@
 <script setup>
 import { Icon } from '@iconify/vue'
+import { calculateDaysDiff, calculateDiscountPrice } from '~/utils/booking'
 
 definePageMeta({
   layout: 'user',
   middleware: 'auth'
-}
-)
-function calculateDaysDiff({checkInDate, checkOutDate}) {
-  // 檢查必要參數
-  if (!checkInDate || !checkOutDate) return 0;
+})
 
-  try {
-    const checkIn = new Date(checkInDate);
-    const checkOut = new Date(checkOutDate);
-
-    // 檢查日期是否有效
-    if (isNaN(checkIn.getTime()) || isNaN(checkOut.getTime())) return 0;
-
-    // 計算毫秒差
-    const diffTime = checkOut - checkIn;
-
-    // 將毫秒差轉換為天數
-    const diffDays = diffTime / (1000 * 60 * 60 * 24);
-
-    return diffDays;
-  } catch (error) {
-    return 0;
-  }
-}
-const formatDate = (v) => {
-  const date = new Date(v);
-  const MONTH = date.getMonth() + 1;
-  const DAY = date.getDate();
-  const WEEK = ['日', '一', '二', '三', '四', '五', '六'][date.getDay()];
-
-  return `${MONTH} 月 ${DAY} 日星期 ${WEEK}`;
-};
-const priceCount = (days,price) => {
-  return days * price
-}
 const { userInfo } = storeToRefs(useUserStore());
 const { getBookingOrders, deleteBookingOrder } = useBookingStore();
 
@@ -98,7 +66,7 @@ const cancelBooking = async (bookingId) => {
             <section class="d-flex flex-column gap-6">
               <h3 class="d-flex align-items-center mb-0 text-neutral-80 fs-8 fs-md-6 fw-bold">
                 <p class="mb-0">
-                  {{ latestBooking?.roomId?.name }}，{{ calculateDaysDiff(latestBooking) }} 晚
+                  {{ latestBooking?.roomId?.name }}，{{ calculateDaysDiff(latestBooking?.checkInDate, latestBooking?.checkOutDate) }} 晚
                 </p>
                 <span
                   class="d-inline-block mx-4 bg-neutral-80"
@@ -111,17 +79,17 @@ const cancelBooking = async (bookingId) => {
   
               <div class="text-neutral-80 fs-8 fs-md-7 fw-bold">
                 <p class="title-deco mb-2">
-                  入住：{{ formatDate(latestBooking?.checkInDate) }}，15:00 可入住
+                  入住：<span v-format-date="latestBooking?.checkInDate" />，15:00 可入住
                 </p>
                 <p
                   class="title-deco mb-0"
                 >
-                  退房：{{ formatDate(latestBooking?.checkOutDate) }}，12:00 前退房
+                  退房：<span v-format-date="latestBooking?.checkOutDate" />，12:00 前退房
                 </p>
               </div>
   
               <p
-                v-currency="calculateDaysDiff(latestBooking) * (latestBooking?.roomId?.price*.9)"
+                v-currency="calculateDiscountPrice(latestBooking)"
                 class="mb-0 text-neutral-80 fs-8 fs-md-7 fw-bold"
               />
             </section>
@@ -219,7 +187,7 @@ const cancelBooking = async (bookingId) => {
 
               <div class="text-neutral-80 fw-medium">
                 <p class="mb-2">
-                  住宿天數： {{ calculateDaysDiff(order) }}晚
+                  住宿天數： {{ calculateDaysDiff(order?.checkInDate, order?.checkOutDate) }}晚
                 </p>
                 <p class="mb-0">
                   住宿人數： {{ order.peopleNum }} 位
@@ -228,16 +196,16 @@ const cancelBooking = async (bookingId) => {
 
               <div class="text-neutral-80 fs-8 fs-md-7 fw-medium">
                 <p class="title-deco mb-2">
-                  入住：{{ formatDate(order.checkInDate) }}，15:00 可入住
+                  入住：<span v-format-date="order.checkInDate" />，15:00 可入住
                 </p>
                 <p
                   class="title-deco mb-0"
                 >
-                  退房：{{ formatDate(order.checkOutDate) }}，12:00 前退房
+                  退房：<span v-format-date="order.checkOutDate" />，12:00 前退房
                 </p>
               </div>
               <p
-                v-currency="priceCount(calculateDaysDiff(order), order.roomId.price * .9)"
+                v-currency="calculateDiscountPrice(order)"
                 class="mb-0 text-neutral-80 fs-8 fs-md-7 fw-bold"
               />
             </section>

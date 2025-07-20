@@ -113,7 +113,7 @@
                 <div class="d-flex align-items-center">
                   <!-- 時間 badge -->
                   <span class="badge bg-secondary me-3 d-none d-lg-inline">
-                    {{ formatDate(order.checkInDate) }} - {{ formatDate(order.checkOutDate) }}
+                    <span v-format-date.locale="order.checkInDate" /> - <span v-format-date.locale="order.checkOutDate" />
                   </span>
                   <span class="fw-bold me-3">訂單編號：{{ order._id }}</span>
                   <span
@@ -163,7 +163,9 @@
                     </div>
                     <div class="d-flex">
                       <span class="text-muted">入住時間：</span>
-                      <span class="fw-medium">{{ formatDate(order.checkInDate) }} - {{ formatDate(order.checkOutDate) }}</span>
+                      <span class="fw-medium">
+                        <span v-format-date.locale="order.checkInDate" /> - <span v-format-date.locale="order.checkOutDate" />
+                      </span>
                     </div>
                     <div class="d-flex">
                       <span class="text-muted">入住天數：</span>
@@ -603,12 +605,6 @@ const calculateTotalPrice = (order) => {
     price = order.roomId.price * days
   }
   return Math.round(price * 0.9).toLocaleString()
-}
-
-// 格式化日期
-const formatDate = (date) => {
-  if (!date) return ''
-  return new Date(date).toLocaleDateString('zh-TW')
 }
 
 // 格式化地址

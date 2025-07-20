@@ -2,6 +2,7 @@
 import { DatePicker } from 'v-calendar'
 import 'v-calendar/style.css'
 import { useScreens } from 'vue-screen-utils'
+import { formatDateMobile } from '~/utils/formatDate'
 
 import { Icon } from '@iconify/vue'
 
@@ -62,8 +63,6 @@ const rows = mapCurrent({ md: 1 }, 2)
 const columns = mapCurrent({ md: 2 }, 1)
 const expanded = mapCurrent({ md: false }, true)
 const titlePosition = mapCurrent({ md: 'center' }, 'left')
-
-const formatDateTitle = date => date?.replaceAll('-', ' / ')
 
 const daysCount = computed(() => {
   const startDate = tempDate.date.start
@@ -149,9 +148,9 @@ const clearDate = () => {
                 {{ daysCount }} 晚
               </h3>
               <div class="d-flex gap-2 text-neutral-80 fs-8 fw-medium">
-                <span>{{ formatDateTitle(tempDate.date.start) }}</span>
+                <span>{{ formatDateMobile(tempDate.date.start) }}</span>
                 -
-                <span>{{ formatDateTitle(tempDate.date.end) }}</span>
+                <span>{{ formatDateMobile(tempDate.date.end) }}</span>
               </div>
             </div>
           </div>

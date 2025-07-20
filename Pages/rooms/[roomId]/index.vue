@@ -1,6 +1,7 @@
 <script setup>
 import { Icon } from '@iconify/vue'
 import DatePickerModal from '@/components/rooms/DatePickerModal.vue'
+import { formatDateMobile } from '~/utils/formatDate'
 
 const route = useRoute()
 // store
@@ -46,15 +47,18 @@ const openModal = () => {
   datePickerModal.value.openModal()
 };
 const currentDate = new Date();
-const daysFormatOnMobile = date => date?.split('-').slice(1, 3).join(' / ')
-const formatDate = (date) => {
+
+// 獲取當前日期的ISO格式字串
+const getCurrentDateISO = () => {
+  const date = new Date()
   const offsetToUTC8 = date.getHours() + 8
   date.setHours(offsetToUTC8)
   return date.toISOString().split('T')[0]
 }
+
 const bookingDate = reactive({
   date: {
-    start: bookingData.value.checkInDate || formatDate(currentDate),
+    start: bookingData.value.checkInDate || getCurrentDateISO(),
     end: bookingData.value.checkOutDate || null
   },
   minDate: new Date(),
@@ -74,7 +78,7 @@ function handleDateChange(bookingInfo) {
 watch(bookingData.value,() => {
   if( !bookingData ) return
   const { checkInDate:start, checkOutDate:end } = bookingData.value;
-    bookingDate.date.start = start ?? formatDate(currentDate);
+    bookingDate.date.start = start ?? getCurrentDateISO();
     bookingDate.date.end = end ?? null;
 })
 // chunk images
@@ -423,7 +427,7 @@ const headToBooking = () => {
         <template v-else>
           <div class="d-flex flex-column gap-1">
             <small class="text-neutral-80 fw-medium">ＮＴ$ {{ countRoomPrice }} / {{ daysDiff }} 晚 / {{ bookingData.peopleNum }} 人</small>
-            <span class="text-neutral fs-9 fw-medium text-decoration-underline">{{ daysFormatOnMobile(bookingDate.date?.start) }} - {{ daysFormatOnMobile( bookingDate.date?.end) }}</span>
+            <span class="text-neutral fs-9 fw-medium text-decoration-underline">{{ formatDateMobile(bookingDate.date?.start) }} - {{ formatDateMobile( bookingDate.date?.end) }}</span>
           </div>
           <button 
             type="button" 

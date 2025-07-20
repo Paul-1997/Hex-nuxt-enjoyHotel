@@ -102,7 +102,7 @@
                   <small class="text-muted d-none d-md-block news-description">{{ news.description }}</small>
                 </td>
                 <td class="d-none d-sm-table-cell">
-                  {{ formatDate(news.updatedAt) }}
+                  <span v-format-date.locale="news.updatedAt" />
                 </td>
                 <td>
                   <div class="btn-group">
@@ -206,10 +206,10 @@
             class="d-lg-flex justify-content-between align-items-center text-muted small"
           >
             <p class="mb-1">
-              建立時間：{{ formatDateTime(tempNews.createdAt) }}
+              建立時間：<span v-format-date.datetime="tempNews.createdAt" />
             </p>
             <p class="mb-0">
-              上次更新時間：{{ formatDateTime(tempNews.updatedAt) }}
+              上次更新時間：<span v-format-date.datetime="tempNews.updatedAt" />
             </p>
           </div>
         </form>
@@ -504,18 +504,6 @@ const handleSubmit = async () => {
 // 處理圖片載入錯誤
 const handleImageError = (event) => {
   event.target.src = 'https://fakeimg.pl/300/200/?text=圖片載入失敗';
-};
-
-// 日期格式化
-const formatDate = (date) => {
-  if (!date) return '';
-  return new Date(date).toLocaleDateString('zh-TW');
-};
-
-const formatDateTime = (date) => {
-  if (!date) return '';
-  const d = new Date(date);
-  return `${d.toLocaleDateString('zh-TW')} ${d.toLocaleTimeString('zh-TW')}`;
 };
 </script> 
 
