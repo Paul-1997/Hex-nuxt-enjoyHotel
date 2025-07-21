@@ -38,9 +38,11 @@ jobs:
       - name: Generate static site
         run: |
           export NODE_ENV=production
+          export APP_BASEURL=https://paul-1997.github.io/Hex-nuxt-enjoyHotel-dev/
           pnpm generate
         env:
           NODE_ENV: production
+          APP_BASEURL: https://paul-1997.github.io/Hex-nuxt-enjoyHotel-dev/
 
       - name: Deploy to GitHub Pages
         id: deployment
