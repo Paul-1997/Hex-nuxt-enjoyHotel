@@ -4,7 +4,6 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['@/assets/styles/all.scss'],
   app: {
-    baseURL: '/Hex-nuxt-enjoyHotel-dev/',
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       viewport: "width=device-width, initial-scale=1",
