@@ -155,16 +155,17 @@ const handleLogout = async () => {
 }
 
 // 響應式處理
+const handleResize = () => {
+  const newIsSmallScreen = window.innerWidth < 768
+  isSmallScreen.value = newIsSmallScreen
+  isSidebarCollapsed.value = newIsSmallScreen
+}
+
 onMounted(() => {
-  const handleResize = () => {
-    const newIsSmallScreen = window.innerWidth < 768
-    isSmallScreen.value = newIsSmallScreen
-    isSidebarCollapsed.value = newIsSmallScreen
-  }
-  
   window.addEventListener('resize', handleResize)
   handleResize() // 初始檢查
 })
+
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 })

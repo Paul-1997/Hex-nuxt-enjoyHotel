@@ -4,6 +4,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['@/assets/styles/all.scss'],
   app: {
+    baseURL: '/Hex-nuxt-enjoyHotel-dev/',
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       viewport: "width=device-width, initial-scale=1",
@@ -37,6 +38,12 @@ export default defineNuxtConfig({
         { 'http-equiv': 'X-UA-Compatible', content: 'IE=edge,chrome=1' }
       ]
     },
+  },
+  nitro: {
+    preset: 'static'
+  },
+  router: {
+    base: '/Hex-nuxt-enjoyHotel-dev/'
   },
   runtimeConfig: {
     public: {

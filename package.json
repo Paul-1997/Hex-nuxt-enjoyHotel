@@ -11,30 +11,30 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
-    "@pinia/nuxt": "0.9.0",
+    "@pinia/nuxt": "0.11.2",
     "@popperjs/core": "^2.11.8",
-    "@vee-validate/i18n": "^4.15.0",
-    "@vee-validate/nuxt": "^4.15.0",
-    "@vee-validate/rules": "^4.15.0",
-    "bootstrap": "^5.3.3",
-    "nuxt": "^3.15.3",
-    "pinia": "^2.3.1",
-    "sweetalert2": "^11.16.0",
-    "swiper": "^11.2.1",
+    "@vee-validate/i18n": "^4.15.1",
+    "@vee-validate/nuxt": "^4.15.1",
+    "@vee-validate/rules": "^4.15.1",
+    "bootstrap": "^5.3.7",
+    "nuxt": "^4.0.1",
+    "pinia": "^3.0.3",
+    "sweetalert2": "^11.22.2",
+    "swiper": "^11.2.10",
     "v-calendar": "^3.1.2",
-    "vue": "latest",
+    "vue": "^3.5.17",
     "vue-loading-overlay": "^6.0.6",
-    "vue-router": "latest",
+    "vue-router": "^4.5.1",
     "vue-screen-utils": "1.0.0-beta.13"
   },
   "devDependencies": {
-    "@iconify/vue": "^4.3.0",
-    "@vitejs/plugin-vue": "^5.2.1",
-    "eslint": "^8.57.1",
+    "@iconify/vue": "^5.0.0",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "eslint": "^9.31.0",
     "eslint-plugin-nuxt": "^4.0.0",
-    "eslint-plugin-vue": "^9.32.0",
-    "prettier": "^3.4.2",
-    "sass": "1.77.6"
+    "eslint-plugin-vue": "^10.3.0",
+    "prettier": "^3.6.2",
+    "sass": "1.89.2"
   },
   "packageManager": "pnpm@9.15.0+sha1.8bfdb6d72b4d5fdf87d21d27f2bfbe2b21dd2629"
 }
