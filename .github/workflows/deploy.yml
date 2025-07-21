@@ -8,6 +8,16 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    # 添加權限設定
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    # 確保在 GitHub Pages 環境中運行
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,11 +36,22 @@ jobs:
         run: pnpm install
 
       - name: Generate static site
-        run: pnpm generate
+        run: |
+          export NODE_ENV=production
+          pnpm generate
+        env:
+          NODE_ENV: production
 
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # 使用你的 Personal Access Token
+          github_token: ${{ secrets.GH_PAGES_TOKEN }}
           publish_dir: ./dist
-          publish_branch: gh-pages 
+          publish_branch: gh-pages
+          force_orphan: true
+          # 添加部署訊息
+          commit_message: "Deploy to GitHub Pages"
+          full_name: "GitHub Actions"
+          email: "actions@github.com" 
