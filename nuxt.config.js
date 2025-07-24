@@ -38,12 +38,6 @@ export default defineNuxtConfig({
       ]
     },
   },
-  nitro: {
-    preset: 'static'
-  },
-  router: {
-    base: '/Hex-nuxt-enjoyHotel-dev/'
-  },
   runtimeConfig: {
     public: {
       "baseURL": process.env.APP_BASEURL,
