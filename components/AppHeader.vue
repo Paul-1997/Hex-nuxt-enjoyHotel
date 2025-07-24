@@ -3,16 +3,15 @@ import { Icon } from '@iconify/vue'
 const { errorAlert } = useAlert()
 const { checkLogin, getUserInfo, userLogout } = useUserStore()
 const { isLogin, userInfo,isAdmin } = storeToRefs(useUserStore())
-console.log(isLogin.value,'isLogin')
 // 掛載時驗證使用者是否登入
 onMounted(async () => {
+  await checkLogin()
+  if (isLogin.value) {
   try {
-    await checkLogin()
-    if (isLogin.value) {
       await getUserInfo()
+    } catch (error) {
+      errorAlert('取得使用者資訊失敗', error?.message || '')
     }
-  } catch (error) {
-    errorAlert('取得使用者資訊失敗', error?.message || '')
   }
 })
 const route = useRoute()

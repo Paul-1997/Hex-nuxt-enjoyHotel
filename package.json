@@ -35,6 +35,5 @@
     "eslint-plugin-vue": "^10.3.0",
     "prettier": "^3.6.2",
     "sass": "1.77.6"
-  },
-  "packageManager": "pnpm@9.15.0+sha1.8bfdb6d72b4d5fdf87d21d27f2bfbe2b21dd2629"
+  }
 }
