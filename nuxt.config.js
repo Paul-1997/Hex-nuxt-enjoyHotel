@@ -56,9 +56,6 @@ export default defineNuxtConfig({
       ErrorMessage: 'VeeErrorMessage',
     },
   },
-  router: {
-    base: '/',
-  },
   imports: {
     dirs: ['stores']
   },
