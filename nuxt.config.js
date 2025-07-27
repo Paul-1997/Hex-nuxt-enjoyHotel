@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   css: ['@/assets/styles/all.scss'],
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
@@ -37,12 +37,6 @@ export default defineNuxtConfig({
         { 'http-equiv': 'X-UA-Compatible', content: 'IE=edge,chrome=1' }
       ]
     },
-  },
-  nitro: {
-    preset: 'static'
-  },
-  router: {
-    base: '/Hex-nuxt-enjoyHotel-dev/'
   },
   runtimeConfig: {
     public: {

@@ -106,7 +106,7 @@ import { Icon } from '@iconify/vue'
         </picture>
 
         <main class="position-relative w-100 w-md-auto">
-          <NuxtPage />
+          <slot />
         </main>
       </div>
     </div>
